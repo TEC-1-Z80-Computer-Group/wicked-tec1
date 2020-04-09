@@ -9,7 +9,7 @@ install:
   - yarn install
 after_success:
   - yarn build
-  - yarn lh -- --score=96 https://TEC-1-Z80-Computer-Group.github.io/wicked-tec1/index.html
+  - yarn lh -- --score=96 https://tec1group.github.io/wicked-tec1/index.html
 cache:
   directories:
     - node_modules
