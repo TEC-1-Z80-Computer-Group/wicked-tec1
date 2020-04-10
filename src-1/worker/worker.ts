@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable @typescript-eslint/camelcase */
 
 import { Z80 } from './z80';
+// @ts-ignore: Module '"nrf-intel-hex"' has no default export
 import MemoryMap from 'nrf-intel-hex';
 
 let running = false;
@@ -15,12 +14,12 @@ const inPorts = Array(256).fill(0xFF);
 const outPorts = Array(256).fill(0xFF);
 
 const cpu = Z80({
-    mem_read: (addr: number) => memory[addr],
-    mem_write: (addr: number, value: number) => memory[addr] = value,
-    io_read: (port: number) => {
+    mem_read: (addr:number) => memory[addr],
+    mem_write: (addr:number, value:number) => memory[addr] = value,
+    io_read: (port:number) => {
         return inPorts[port & 0xFF];
     },
-    io_write: (port: number, value: number) => {
+    io_write: (port:number, value:number) => {
         const port1 = port & 0xFF;
         outPorts[port1] = value;
         updateDisplay();
@@ -48,6 +47,8 @@ self.onmessage = event => {
             running = true;
             run();
         }
+    }
+    else if (event.data.type === 'RESUME') {
     }
     else if (event.data.type === 'RESET') {
         console.log('resetting');
@@ -81,7 +82,7 @@ self.onmessage = event => {
         readMemory(event.data.from, event.data.size);
     }
     else if (event.data.type === 'HIDDEN') {
-        const hidden = event.data.value;
+        let hidden = event.data.value;
         if (hidden) {
             running = false;
         }
@@ -128,7 +129,7 @@ function run() {
             pending = false;
             run();
         }, delay)
-    }
+    };
 }
 
 function updateDisplay() {
@@ -144,8 +145,8 @@ function updateDisplay() {
 }
 
 function getPortsBuffer(){
-    const buffer = new ArrayBuffer(4);
-    const view = new Uint8Array(buffer);
+    var buffer = new ArrayBuffer(4);
+    var view = new Uint8Array(buffer);
     view[0] = outPorts[0];
     view[1] = outPorts[1];
     view[2] = outPorts[2];
@@ -153,8 +154,8 @@ function getPortsBuffer(){
 }
 
 function getDisplayBuffer(){
-    const buffer = new ArrayBuffer(6);
-    const view = new Uint8Array(buffer);
+    var buffer = new ArrayBuffer(6);
+    var view = new Uint8Array(buffer);
     for (let i = 0; i < 6; i++) {
         view[i] = display[i];
     }
@@ -163,7 +164,7 @@ function getDisplayBuffer(){
 
 let speaker = 1;
 let wavelength = 0;
-function postOutPorts(port: number, value: number) {
+function postOutPorts(port:number, value:number) {
     const buffer = getPortsBuffer();
     const display = getDisplayBuffer();
 
@@ -184,12 +185,13 @@ function postOutPorts(port: number, value: number) {
         speaker,
         wavelength,
         pc: cpu.getPC(),
+    // @ts-ignore: Type 'ArrayBuffer' is not assignable to type 'string' bug in type definition
     }, [buffer, display]);
 }
 
-function updateMemory(rom: string) {
+function updateMemory(rom:string) {
     const blocks = MemoryMap.fromHex(rom);
-    for (const address of blocks.keys()) {
+    for (let address of blocks.keys()) {
         const block = blocks.get(address);
         for (let i = 0; i < block.length; i++) {
             memory[i + address] = block[i];
@@ -197,9 +199,9 @@ function updateMemory(rom: string) {
     }
 }
 
-function readMemory(from: number, size: number) {
-    const buffer = new ArrayBuffer(size);
-    const bytes = new Uint8Array(buffer);
+function readMemory(from:number, size:number) {
+    let buffer = new ArrayBuffer(size);
+    let bytes = new Uint8Array(buffer);
     for (let i = 0; i < size; i++) {
         bytes[i] = memory[i + from]
     }
@@ -208,5 +210,6 @@ function readMemory(from: number, size: number) {
         from,
         size,
         buffer,
+    // @ts-ignore: Type 'ArrayBuffer' is not assignable to type 'string' bug in type definition
     }, [buffer]);
 }

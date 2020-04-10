@@ -1,4 +1,4 @@
-export const [hidden, visibilityChange] = (typeof (document as any).msHidden !== 'undefined') ?
+let [hidden, visibilityChange] = (typeof (document as any).msHidden !== 'undefined') ?
   ['msHidden', 'msvisibilitychange'] : (typeof (document as any).webkitHidden !== 'undefined') ?
     ['webkitHidden', 'webkitvisibilitychange'] : ['hidden', 'visibilitychange'];
 

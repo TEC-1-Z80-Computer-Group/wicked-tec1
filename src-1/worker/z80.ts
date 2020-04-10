@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable @typescript-eslint/camelcase */
 ///////////////////////////////////////////////////////////////////////////////
 /// @file Z80.js
 ///
@@ -37,46 +35,46 @@ interface CoreParameter {
 }
 
 interface Z80State {
-    b: number;
-    a: number;
-    c: number;
-    d: number;
-    e: number;
-    h: number;
-    l: number;
-    a_prime: number;
-    b_prime: number;
-    c_prime: number;
-    d_prime: number;
-    e_prime: number;
-    h_prime: number;
-    l_prime: number;
-    ix: number;
-    iy: number;
-    i: number;
-    r: number;
-    sp: number;
-    pc: number;
+    b:number;
+    a:number;
+    c:number;
+    d:number;
+    e:number;
+    h:number;
+    l:number;
+    a_prime:number;
+    b_prime:number;
+    c_prime:number;
+    d_prime:number;
+    e_prime:number;
+    h_prime:number;
+    l_prime:number;
+    ix:number;
+    iy:number;
+    i:number;
+    r:number;
+    sp:number;
+    pc:number;
     flags: {
-        S: number;
-        Z: number;
-        Y: number;
-        H: number;
-        X: number;
-        P: number;
-        N: number;
-        C: number;
-    };
+        S:number;
+        Z:number;
+        Y:number;
+        H:number;
+        X:number;
+        P:number;
+        N:number;
+        C:number;
+    }
     flags_prime: {
-        S: number;
-        Z: number;
-        Y: number;
-        H: number;
-        X: number;
-        P: number;
-        N: number;
-        C: number;
-    };
+        S:number;
+        Z:number;
+        Y:number;
+        H:number;
+        X:number;
+        P:number;
+        N:number;
+        C:number;
+    }
     imode: number;
     iff1: number;
     iff2: number;
@@ -88,7 +86,7 @@ interface Z80State {
 
 export function Z80(coreParameter: CoreParameter) {
     // Obviously we'll be needing the core object's functions again.
-    const core = coreParameter;
+    let core = coreParameter;
 
     // The argument to this constructor should be an object containing 4 functions:
     // mem_read(address) should return the byte at the given memory address,
@@ -131,8 +129,8 @@ export function Z80(coreParameter: CoreParameter) {
     //  because most of the time we're only accessing a single flag,
     //  so we optimize for that case and use utility functions
     //  for the rarer occasions when we need to access the whole register.
-    const flags = { S: 0, Z: 0, Y: 0, H: 0, X: 0, P: 0, N: 0, C: 0 };
-    const flags_prime = { S: 0, Z: 0, Y: 0, H: 0, X: 0, P: 0, N: 0, C: 0 };
+    let flags = { S: 0, Z: 0, Y: 0, H: 0, X: 0, P: 0, N: 0, C: 0 };
+    let flags_prime = { S: 0, Z: 0, Y: 0, H: 0, X: 0, P: 0, N: 0, C: 0 };
     // And finally we have the interrupt mode and flip-flop registers.
     let imode = 0;
     let iff1 = 0;
@@ -149,7 +147,7 @@ export function Z80(coreParameter: CoreParameter) {
     //  including processing any prefixes and handling interrupts.
     let cycle_counter = 0;
 
-    function getState(): Z80State {
+    function getState():Z80State {
         return {
             b: b,
             a: a,
@@ -205,7 +203,7 @@ export function Z80(coreParameter: CoreParameter) {
         return pc;
     }
 
-    function setState(state: Z80State) {
+    function setState(state:Z80State) {
         b = state.b;
         a = state.a;
         c = state.c;
@@ -256,7 +254,7 @@ export function Z80(coreParameter: CoreParameter) {
     ///
     /// @brief Re-initialize the processor as if a reset or power on had occured
     ///////////////////////////////////////////////////////////////////////////////
-    const reset = function () {
+    let reset = function () {
         // These registers are the ones that have predictable states
         //  immediately following a power-on or a reset.
         // The others are left alone, because their states are unpredictable.
@@ -277,7 +275,7 @@ export function Z80(coreParameter: CoreParameter) {
         cycle_counter = 0;
     };
 
-    const reset1 = function () {
+    let reset1 = function () {
         sp = 0xdff0;
         pc = 0x0000;
         halted = false;
@@ -292,12 +290,12 @@ export function Z80(coreParameter: CoreParameter) {
     ///          plus any time that went into handling interrupts that fired
     ///          while this instruction was executing
     ///////////////////////////////////////////////////////////////////////////////
-    const run_instruction = function () {
+    let run_instruction = function () {
         if (!halted) {
             // If the previous instruction was a DI or an EI,
             //  we'll need to disable or enable interrupts
             //  after whatever instruction we're about to run is finished.
-            let doing_delayed_di = false, doing_delayed_ei = false;
+            var doing_delayed_di = false, doing_delayed_ei = false;
             if (do_delayed_di) {
                 do_delayed_di = false;
                 doing_delayed_di = true;
@@ -314,7 +312,7 @@ export function Z80(coreParameter: CoreParameter) {
             r = (r & 0x80) | (((r & 0x7f) + 1) & 0x7f);
 
             // Read the byte at the PC and run the instruction it encodes.
-            const opcode = core.mem_read(pc);
+            var opcode = core.mem_read(pc);
             decode_instruction(opcode);
             pc = (pc + 1) & 0xffff;
 
@@ -330,7 +328,7 @@ export function Z80(coreParameter: CoreParameter) {
 
             // And finally clear out the cycle counter for the next instruction
             //  before returning it to the emulator core.
-            const retval = cycle_counter;
+            var retval = cycle_counter;
             cycle_counter = 0;
             return retval;
         }
@@ -349,7 +347,7 @@ export function Z80(coreParameter: CoreParameter) {
     /// @param non_maskable - true if this is a non-maskable interrupt
     /// @param data - the value to be placed on the data bus, if needed
     ///////////////////////////////////////////////////////////////////////////////
-    const interrupt = function (non_maskable: boolean, data: number) {
+    let interrupt = function (non_maskable:boolean, data:number) {
         if (non_maskable) {
             // The high bit of R is not affected by this increment,
             //  it can only be changed using the LD R, A instruction.
@@ -392,7 +390,7 @@ export function Z80(coreParameter: CoreParameter) {
                 // The Z80 manual says that this address must be 2-byte aligned,
                 //  but it doesn't appear that this is actually the case on the hardware,
                 //  so we don't attempt to enforce that here.
-                const vector_address = ((i << 8) | data);
+                var vector_address = ((i << 8) | data);
                 pc = core.mem_read(vector_address) |
                     (core.mem_read((vector_address + 1) & 0xffff) << 8);
 
@@ -406,12 +404,12 @@ export function Z80(coreParameter: CoreParameter) {
     ///
     /// What begins here are just general utility functions, used variously.
     ///////////////////////////////////////////////////////////////////////////////
-    const decode_instruction = function (opcode: number) {
+    let decode_instruction = function (opcode:number) {
         // The register-to-register loads and ALU instructions
         //  are all so uniform that we can decode them directly
         //  instead of going into the instruction array for them.
         // This function gets the operand for all of these instructions.
-        const get_operand = function (opcode: number) {
+        var get_operand = function (opcode:number) {
             return ((opcode & 0x07) === 0) ? b :
                 ((opcode & 0x07) === 1) ? c :
                     ((opcode & 0x07) === 2) ? d :
@@ -429,7 +427,7 @@ export function Z80(coreParameter: CoreParameter) {
         else if ((opcode >= 0x40) && (opcode < 0x80)) {
             // This entire range is all 8-bit register loads.
             // Get the operand and assign it to the correct destination.
-            const operand = get_operand(opcode);
+            var operand = get_operand(opcode);
 
             if (((opcode & 0x38) >>> 3) === 0)
                 b = operand;
@@ -452,8 +450,8 @@ export function Z80(coreParameter: CoreParameter) {
             // These are the 8-bit register ALU instructions.
             // We'll get the operand and then use this "jump table"
             //  to call the correct utility function for the instruction.
-            const operand = get_operand(opcode);
-            const    op_array = [do_add, do_adc, do_sub, do_sbc,
+            var operand = get_operand(opcode),
+                op_array = [do_add, do_adc, do_sub, do_sbc,
                     do_and, do_xor, do_or, do_cp];
 
             op_array[(opcode & 0x38) >>> 3](operand);
@@ -461,7 +459,7 @@ export function Z80(coreParameter: CoreParameter) {
         else {
             // This is one of the less formulaic instructions;
             //  we'll get the specific function for it from our array.
-            const func = instructions[opcode];
+            var func = instructions[opcode];
             func();
         }
 
@@ -472,7 +470,7 @@ export function Z80(coreParameter: CoreParameter) {
         cycle_counter += cycle_counts[opcode];
     };
 
-    const get_signed_offset_byte = function (value: number) {
+    let get_signed_offset_byte = function (value:number) {
         // This function requires some explanation.
         // We just use JavaScript Number variables for our registers,
         //  not like a typed array or anything.
@@ -496,7 +494,7 @@ export function Z80(coreParameter: CoreParameter) {
         return value;
     };
 
-    const get_flags_register = function () {
+    let get_flags_register = function () {
         // We need the whole F register for some reason.
         //  probably a PUSH AF instruction,
         //  so make the F register out of our separate flags.
@@ -510,7 +508,7 @@ export function Z80(coreParameter: CoreParameter) {
             (flags.C);
     };
 
-    const get_flags_prime = function () {
+    let get_flags_prime = function () {
         // This is the same as the above for the F' register.
         return (flags_prime.S << 7) |
             (flags_prime.Z << 6) |
@@ -522,7 +520,7 @@ export function Z80(coreParameter: CoreParameter) {
             (flags_prime.C);
     };
 
-    const set_flags_register = function (operand: number) {
+    let set_flags_register = function (operand:number) {
         // We need to set the F register, probably for a POP AF,
         //  so break out the given value into our separate flags.
         flags.S = (operand & 0x80) >>> 7;
@@ -535,7 +533,7 @@ export function Z80(coreParameter: CoreParameter) {
         flags.C = (operand & 0x01);
     };
 
-    const set_flags_prime = function (operand: number) {
+    let set_flags_prime = function (operand:number) {
         // Again, this is the same as the above for F'.
         flags_prime.S = (operand & 0x80) >>> 7;
         flags_prime.Z = (operand & 0x40) >>> 6;
@@ -547,7 +545,7 @@ export function Z80(coreParameter: CoreParameter) {
         flags_prime.C = (operand & 0x01);
     };
 
-    const update_xy_flags = function (result: number) {
+    let update_xy_flags = function (result:number) {
         // Most of the time, the undocumented flags
         //  (sometimes called X and Y, or 3 and 5),
         //  take their values from the corresponding bits
@@ -558,10 +556,10 @@ export function Z80(coreParameter: CoreParameter) {
         flags.X = (result & 0x08) >>> 3;
     };
 
-    const get_parity = function (value: number) {
+    let get_parity = function (value:number) {
         // We could try to actually calculate the parity every time,
         //  but why calculate what you can pre-calculate?
-        const parity_bits = [
+        var parity_bits = [
             1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
             0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
             0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
@@ -582,7 +580,7 @@ export function Z80(coreParameter: CoreParameter) {
         return parity_bits[value];
     };
 
-    const push_word = function (operand: number) {
+    let push_word = function (operand:number) {
         // Pretty obvious what this function does; given a 16-bit value,
         //  decrement the stack pointer, write the high byte to the new
         //  stack pointer location, then repeat for the low byte.
@@ -592,10 +590,10 @@ export function Z80(coreParameter: CoreParameter) {
         core.mem_write(sp, operand & 0x00ff);
     };
 
-    const pop_word = function () {
+    let pop_word = function () {
         // Again, not complicated; read a byte off the top of the stack,
         //  increment the stack pointer, rinse and repeat.
-        let retval = core.mem_read(sp) & 0xff;
+        var retval = core.mem_read(sp) & 0xff;
         sp = (sp + 1) & 0xffff;
         retval |= core.mem_read(sp) << 8;
         sp = (sp + 1) & 0xffff;
@@ -608,7 +606,7 @@ export function Z80(coreParameter: CoreParameter) {
     ///  utility function that handles all variations of that instruction.
     /// Those utility functions begin here.
     ///////////////////////////////////////////////////////////////////////////////
-    const do_conditional_absolute_jump = function (condition: boolean) {
+    let do_conditional_absolute_jump = function (condition:boolean) {
         // This function implements the JP [condition],nn instructions.
         if (condition) {
             // We're taking this jump, so write the new PC,
@@ -626,13 +624,13 @@ export function Z80(coreParameter: CoreParameter) {
         }
     };
 
-    const do_conditional_relative_jump = function (condition: boolean) {
+    let do_conditional_relative_jump = function (condition:boolean) {
         // This function implements the JR [condition],n instructions.
         if (condition) {
             // We need a few more cycles to actually take the jump.
             cycle_counter += 5;
             // Calculate the offset specified by our operand.
-            const offset = get_signed_offset_byte(core.mem_read((pc + 1) & 0xffff));
+            var offset = get_signed_offset_byte(core.mem_read((pc + 1) & 0xffff));
             // Add the offset to the PC, also skipping past this instruction.
             pc = (pc + offset + 1) & 0xffff;
         }
@@ -642,7 +640,7 @@ export function Z80(coreParameter: CoreParameter) {
         }
     };
 
-    const do_conditional_call = function (condition: boolean) {
+    let do_conditional_call = function (condition:boolean) {
         // This function is the CALL [condition],nn instructions.
         // If you've seen the previous functions, you know this drill.
         if (condition) {
@@ -657,25 +655,25 @@ export function Z80(coreParameter: CoreParameter) {
         }
     };
 
-    const do_conditional_return = function (condition: boolean) {
+    let do_conditional_return = function (condition:boolean) {
         if (condition) {
             cycle_counter += 6;
             pc = (pop_word() - 1) & 0xffff;
         }
     };
 
-    const do_reset = function (address: number) {
+    let do_reset = function (address:number) {
         // The RST [address] instructions go through here.
         push_word((pc + 1) & 0xffff);
         pc = (address - 1) & 0xffff;
     };
 
-    const do_add = function (operand: number) {
+    let do_add = function (operand:number) {
         // This is the ADD A, [operand] instructions.
         // We'll do the literal addition, which includes any overflow,
         //  so that we can more easily figure out whether we had
         //  an overflow or a carry and set the flags accordingly.
-        const result = a + operand;
+        var result = a + operand;
 
         // The great majority of the work for the arithmetic instructions
         //  turns out to be setting the flags rather than the actual operation.
@@ -692,8 +690,8 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_adc = function (operand: number) {
-        const result = a + operand + flags.C;
+    let do_adc = function (operand:number) {
+        var result = a + operand + flags.C;
 
         flags.S = (result & 0x80) ? 1 : 0;
         flags.Z = !(result & 0xff) ? 1 : 0;
@@ -706,8 +704,8 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_sub = function (operand: number) {
-        const result = a - operand;
+    let do_sub = function (operand:number) {
+        var result = a - operand;
 
         flags.S = (result & 0x80) ? 1 : 0;
         flags.Z = !(result & 0xff) ? 1 : 0;
@@ -720,8 +718,8 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_sbc = function (operand: number) {
-        const result = a - operand - flags.C;
+    let do_sbc = function (operand:number) {
+        var result = a - operand - flags.C;
 
         flags.S = (result & 0x80) ? 1 : 0;
         flags.Z = !(result & 0xff) ? 1 : 0;
@@ -734,10 +732,10 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_cp = function (operand: number) {
+    let do_cp = function (operand:number) {
         // A compare instruction is just a subtraction that doesn't save the value,
         //  so we implement it as... a subtraction that doesn't save the value.
-        const temp = a;
+        var temp = a;
         do_sub(operand);
         a = temp;
         // Since this instruction has no "result" value, the undocumented flags
@@ -745,7 +743,7 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(operand);
     };
 
-    const do_and = function (operand: number) {
+    let do_and = function (operand:number) {
         // The logic instructions are all pretty straightforward.
         a &= operand & 0xff;
         flags.S = (a & 0x80) ? 1 : 0;
@@ -757,7 +755,7 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_or = function (operand: number) {
+    let do_or = function (operand:number) {
         a = (operand | a) & 0xff;
         flags.S = (a & 0x80) ? 1 : 0;
         flags.Z = !a ? 1 : 0;
@@ -768,7 +766,7 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_xor = function (operand: number) {
+    let do_xor = function (operand:number) {
         a = (operand ^ a) & 0xff;
         flags.S = (a & 0x80) ? 1 : 0;
         flags.Z = !a ? 1 : 0;
@@ -779,8 +777,8 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_inc = function (operand: number) {
-        let result = operand + 1;
+    let do_inc = function (operand:number) {
+        var result = operand + 1;
 
         flags.S = (result & 0x80) ? 1 : 0;
         flags.Z = !(result & 0xff) ? 1 : 0;
@@ -795,8 +793,8 @@ export function Z80(coreParameter: CoreParameter) {
         return result;
     };
 
-    const do_dec = function (operand: number) {
-        let result = operand - 1;
+    let do_dec = function (operand:number) {
+        var result = operand - 1;
 
         flags.S = (result & 0x80) ? 1 : 0;
         flags.Z = !(result & 0xff) ? 1 : 0;
@@ -810,10 +808,10 @@ export function Z80(coreParameter: CoreParameter) {
         return result;
     };
 
-    const do_hl_add = function (operand: number) {
+    let do_hl_add = function (operand:number) {
         // The HL arithmetic instructions are the same as the A ones,
         //  just with twice as many bits happening.
-        const hl = l | (h << 8), result = hl + operand;
+        var hl = l | (h << 8), result = hl + operand;
 
         flags.N = 0;
         flags.C = (result & 0x10000) ? 1 : 0;
@@ -825,9 +823,9 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(h);
     };
 
-    const do_hl_adc = function (operand: number) {
+    let do_hl_adc = function (operand:number) {
         operand += flags.C;
-        const hl = l | (h << 8), result = hl + operand;
+        var hl = l | (h << 8), result = hl + operand;
 
         flags.S = (result & 0x8000) ? 1 : 0;
         flags.Z = !(result & 0xffff) ? 1 : 0;
@@ -842,9 +840,9 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(h);
     };
 
-    const do_hl_sbc = function (operand: number) {
+    let do_hl_sbc = function (operand:number) {
         operand += flags.C;
-        const hl = l | (h << 8), result = hl - operand;
+        var hl = l | (h << 8), result = hl - operand;
 
         flags.S = (result & 0x8000) ? 1 : 0;
         flags.Z = !(result & 0xffff) ? 1 : 0;
@@ -859,8 +857,8 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(h);
     };
 
-    const do_in = function (port: number) {
-        const result = core.io_read(port);
+    let do_in = function (port:number) {
+        var result = core.io_read(port);
 
         flags.S = (result & 0x80) ? 1 : 0;
         flags.Z = result ? 0 : 1;
@@ -872,7 +870,7 @@ export function Z80(coreParameter: CoreParameter) {
         return result;
     };
 
-    const do_neg = function () {
+    let do_neg = function () {
         // This instruction is defined to not alter the register if it === 0x80.
         if (a !== 0x80) {
             // This is a signed operation, so convert A to a signed value.
@@ -890,13 +888,13 @@ export function Z80(coreParameter: CoreParameter) {
         update_xy_flags(a);
     };
 
-    const do_ldi = function () {
+    let do_ldi = function () {
         // Copy the value that we're supposed to copy.
-        const read_value = core.mem_read(l | (h << 8));
+        var read_value = core.mem_read(l | (h << 8));
         core.mem_write(e | (d << 8), read_value);
 
         // Increment DE and HL, and decrement BC.
-        let result = (e | (d << 8)) + 1;
+        var result = (e | (d << 8)) + 1;
         e = result & 0xff;
         d = (result & 0xff00) >>> 8;
         result = (l | (h << 8)) + 1;
@@ -913,15 +911,15 @@ export function Z80(coreParameter: CoreParameter) {
         flags.X = ((a + read_value) & 0x08) >>> 3;
     };
 
-    const do_cpi = function () {
-        const temp_carry = flags.C;
-        const read_value = core.mem_read(l | (h << 8))
+    let do_cpi = function () {
+        var temp_carry = flags.C;
+        var read_value = core.mem_read(l | (h << 8))
         do_cp(read_value);
         flags.C = temp_carry;
         flags.Y = ((a - read_value - flags.H) & 0x02) >>> 1;
         flags.X = ((a - read_value - flags.H) & 0x08) >>> 3;
 
-        let result = (l | (h << 8)) + 1;
+        var result = (l | (h << 8)) + 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
         result = (c | (b << 8)) - 1;
@@ -931,22 +929,22 @@ export function Z80(coreParameter: CoreParameter) {
         flags.P = result ? 1 : 0;
     };
 
-    const do_ini = function () {
+    let do_ini = function () {
         b = do_dec(b);
 
         core.mem_write(l | (h << 8), core.io_read((b << 8) | c));
 
-        const result = (l | (h << 8)) + 1;
+        var result = (l | (h << 8)) + 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
 
         flags.N = 1;
     };
 
-    const do_outi = function () {
+    let do_outi = function () {
         core.io_write((b << 8) | c, core.mem_read(l | (h << 8)));
 
-        const result = (l | (h << 8)) + 1;
+        var result = (l | (h << 8)) + 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
 
@@ -954,14 +952,14 @@ export function Z80(coreParameter: CoreParameter) {
         flags.N = 1;
     };
 
-    const do_ldd = function () {
+    let do_ldd = function () {
         flags.N = 0;
         flags.H = 0;
 
-        const read_value = core.mem_read(l | (h << 8));
+        var read_value = core.mem_read(l | (h << 8));
         core.mem_write(e | (d << 8), read_value);
 
-        let result = (e | (d << 8)) - 1;
+        var result = (e | (d << 8)) - 1;
         e = result & 0xff;
         d = (result & 0xff00) >>> 8;
         result = (l | (h << 8)) - 1;
@@ -976,15 +974,15 @@ export function Z80(coreParameter: CoreParameter) {
         flags.X = ((a + read_value) & 0x08) >>> 3;
     };
 
-    const do_cpd = function () {
-        const temp_carry = flags.C
-        const read_value = core.mem_read(l | (h << 8))
+    let do_cpd = function () {
+        var temp_carry = flags.C
+        var read_value = core.mem_read(l | (h << 8))
         do_cp(read_value);
         flags.C = temp_carry;
         flags.Y = ((a - read_value - flags.H) & 0x02) >>> 1;
         flags.X = ((a - read_value - flags.H) & 0x08) >>> 3;
 
-        let result = (l | (h << 8)) - 1;
+        var result = (l | (h << 8)) - 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
         result = (c | (b << 8)) - 1;
@@ -994,22 +992,22 @@ export function Z80(coreParameter: CoreParameter) {
         flags.P = result ? 1 : 0;
     };
 
-    const do_ind = function () {
+    let do_ind = function () {
         b = do_dec(b);
 
         core.mem_write(l | (h << 8), core.io_read((b << 8) | c));
 
-        const result = (l | (h << 8)) - 1;
+        var result = (l | (h << 8)) - 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
 
         flags.N = 1;
     };
 
-    const do_outd = function () {
+    let do_outd = function () {
         core.io_write((b << 8) | c, core.mem_read(l | (h << 8)));
 
-        const result = (l | (h << 8)) - 1;
+        var result = (l | (h << 8)) - 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
 
@@ -1017,7 +1015,7 @@ export function Z80(coreParameter: CoreParameter) {
         flags.N = 1;
     };
 
-    const do_rlc = function (operand: number) {
+    let do_rlc = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
@@ -1032,7 +1030,7 @@ export function Z80(coreParameter: CoreParameter) {
         return operand;
     };
 
-    const do_rrc = function (operand: number) {
+    let do_rrc = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
@@ -1047,11 +1045,11 @@ export function Z80(coreParameter: CoreParameter) {
         return operand & 0xff;
     };
 
-    const do_rl = function (operand: number) {
+    let do_rl = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
-        const temp = flags.C;
+        var temp = flags.C;
         flags.C = (operand & 0x80) >>> 7;
         operand = ((operand << 1) | temp) & 0xff;
 
@@ -1063,11 +1061,11 @@ export function Z80(coreParameter: CoreParameter) {
         return operand;
     };
 
-    const do_rr = function (operand: number) {
+    let do_rr = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
-        const temp = flags.C;
+        var temp = flags.C;
         flags.C = operand & 1;
         operand = ((operand >>> 1) & 0x7f) | (temp << 7);
 
@@ -1079,7 +1077,7 @@ export function Z80(coreParameter: CoreParameter) {
         return operand;
     };
 
-    const do_sla = function (operand: number) {
+    let do_sla = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
@@ -1094,7 +1092,7 @@ export function Z80(coreParameter: CoreParameter) {
         return operand;
     };
 
-    const do_sra = function (operand: number) {
+    let do_sra = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
@@ -1109,7 +1107,7 @@ export function Z80(coreParameter: CoreParameter) {
         return operand;
     };
 
-    const do_sll = function (operand: number) {
+    let do_sll = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
@@ -1124,7 +1122,7 @@ export function Z80(coreParameter: CoreParameter) {
         return operand;
     };
 
-    const do_srl = function (operand: number) {
+    let do_srl = function (operand:number) {
         flags.N = 0;
         flags.H = 0;
 
@@ -1139,10 +1137,10 @@ export function Z80(coreParameter: CoreParameter) {
         return operand;
     };
 
-    const do_ix_add = function (operand: number) {
+    let do_ix_add = function (operand:number) {
         flags.N = 0;
 
-        const result = ix + operand;
+        var result = ix + operand;
 
         flags.C = (result & 0x10000) ? 1 : 0;
         flags.H = (((ix & 0xfff) + (operand & 0xfff)) & 0x1000) ? 1 : 0;
@@ -1158,10 +1156,10 @@ export function Z80(coreParameter: CoreParameter) {
     ///  register loads and the accumulator ALU instructions, in other words).
     /// Similar tables for the ED and DD/FD prefixes follow this one.
     ///////////////////////////////////////////////////////////////////////////////
-    const instructions: any[] = [];
+    let instructions:any[] = [];
 
     // 0x00 : NOP
-    instructions[0x00] = function () { return };
+    instructions[0x00] = function () { };
     // 0x01 : LD BC, nn
     instructions[0x01] = function () {
         pc = (pc + 1) & 0xffff;
@@ -1175,7 +1173,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x03 : INC BC
     instructions[0x03] = function () {
-        let result = (c | (b << 8));
+        var result = (c | (b << 8));
         result += 1;
         c = result & 0xff;
         b = (result & 0xff00) >>> 8;
@@ -1199,7 +1197,7 @@ export function Z80(coreParameter: CoreParameter) {
         //  more general Z80-specific RLC instruction.
         // Specifially, RLCA is a version of RLC A that affects fewer flags.
         // The same applies to RRCA, RLA, and RRA.
-        const temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
+        var temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
         a = do_rlc(a);
         flags.S = temp_s;
         flags.Z = temp_z;
@@ -1207,7 +1205,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x08 : EX AF, AF'
     instructions[0x08] = function () {
-        let temp = a;
+        var temp = a;
         a = a_prime;
         a_prime = temp;
 
@@ -1225,7 +1223,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x0b : DEC BC
     instructions[0x0b] = function () {
-        let result = (c | (b << 8));
+        var result = (c | (b << 8));
         result -= 1;
         c = result & 0xff;
         b = (result & 0xff00) >>> 8;
@@ -1245,7 +1243,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x0f : RRCA
     instructions[0x0f] = function () {
-        const temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
+        var temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
         a = do_rrc(a);
         flags.S = temp_s;
         flags.Z = temp_z;
@@ -1269,7 +1267,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x13 : INC DE
     instructions[0x13] = function () {
-        let result = (e | (d << 8));
+        var result = (e | (d << 8));
         result += 1;
         e = result & 0xff;
         d = (result & 0xff00) >>> 8;
@@ -1289,7 +1287,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x17 : RLA
     instructions[0x17] = function () {
-        const temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
+        var temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
         a = do_rl(a);
         flags.S = temp_s;
         flags.Z = temp_z;
@@ -1297,7 +1295,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x18 : JR n
     instructions[0x18] = function () {
-        const offset = get_signed_offset_byte(core.mem_read((pc + 1) & 0xffff));
+        var offset = get_signed_offset_byte(core.mem_read((pc + 1) & 0xffff));
         pc = (pc + offset + 1) & 0xffff;
     };
     // 0x19 : ADD HL, DE
@@ -1310,7 +1308,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x1b : DEC DE
     instructions[0x1b] = function () {
-        let result = (e | (d << 8));
+        var result = (e | (d << 8));
         result -= 1;
         e = result & 0xff;
         d = (result & 0xff00) >>> 8;
@@ -1330,7 +1328,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x1f : RRA
     instructions[0x1f] = function () {
-        const temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
+        var temp_s = flags.S, temp_z = flags.Z, temp_p = flags.P;
         a = do_rr(a);
         flags.S = temp_s;
         flags.Z = temp_z;
@@ -1350,7 +1348,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x22 : LD (nn), HL
     instructions[0x22] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -1359,7 +1357,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x23 : INC HL
     instructions[0x23] = function () {
-        let result = (l | (h << 8));
+        var result = (l | (h << 8));
         result += 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
@@ -1379,7 +1377,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x27 : DAA
     instructions[0x27] = function () {
-        let temp = a;
+        var temp = a;
         if (!flags.N) {
             if (flags.H || ((a & 0x0f) > 9))
                 temp += 0x06;
@@ -1418,7 +1416,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x2a : LD HL, (nn)
     instructions[0x2a] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -1427,7 +1425,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x2b : DEC HL
     instructions[0x2b] = function () {
-        let result = (l | (h << 8));
+        var result = (l | (h << 8));
         result -= 1;
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
@@ -1465,7 +1463,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x32 : LD (nn), A
     instructions[0x32] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -1477,12 +1475,12 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x34 : INC (HL)
     instructions[0x34] = function () {
-        const address = l | (h << 8);
+        var address = l | (h << 8);
         core.mem_write(address, do_inc(core.mem_read(address)));
     };
     // 0x35 : DEC (HL)
     instructions[0x35] = function () {
-        const address = l | (h << 8);
+        var address = l | (h << 8);
         core.mem_write(address, do_dec(core.mem_read(address)));
     };
     // 0x36 : LD (HL), n
@@ -1508,7 +1506,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x3a : LD A, (nn)
     instructions[0x3a] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -1544,7 +1542,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xc1 : POP BC
     instructions[0xc1] = function () {
-        const result = pop_word();
+        var result = pop_word();
         c = result & 0xff;
         b = (result & 0xff00) >>> 8;
     };
@@ -1598,13 +1596,13 @@ export function Z80(coreParameter: CoreParameter) {
         // We don't have a table for this prefix,
         //  the instructions are all so uniform that we can directly decode them.
         pc = (pc + 1) & 0xffff;
-        const opcode = core.mem_read(pc),
+        var opcode = core.mem_read(pc),
             bit_number = (opcode & 0x38) >>> 3,
             reg_code = opcode & 0x07;
 
         if (opcode < 0x40) {
             // Shift/rotate instructions
-            const op_array = [do_rlc, do_rrc, do_rl, do_rr,
+            var op_array = [do_rlc, do_rrc, do_rl, do_rr,
                 do_sla, do_sra, do_sll, do_srl];
 
             if (reg_code === 0)
@@ -1726,7 +1724,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xd1 : POP DE
     instructions[0xd1] = function () {
-        const result = pop_word();
+        var result = pop_word();
         e = result & 0xff;
         d = (result & 0xff00) >>> 8;
     };
@@ -1762,7 +1760,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xd9 : EXX
     instructions[0xd9] = function () {
-        let temp = b;
+        var temp = b;
         b = b_prime;
         b_prime = temp;
         temp = c;
@@ -1803,7 +1801,7 @@ export function Z80(coreParameter: CoreParameter) {
         r = (r & 0x80) | (((r & 0x7f) + 1) & 0x7f);
 
         pc = (pc + 1) & 0xffff;
-        const opcode = core.mem_read(pc),
+        var opcode = core.mem_read(pc),
             func = dd_instructions[opcode];
 
         if (func) {
@@ -1837,7 +1835,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xe1 : POP HL
     instructions[0xe1] = function () {
-        const result = pop_word();
+        var result = pop_word();
         l = result & 0xff;
         h = (result & 0xff00) >>> 8;
     };
@@ -1847,7 +1845,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xe3 : EX (SP), HL
     instructions[0xe3] = function () {
-        let temp = core.mem_read(sp);
+        var temp = core.mem_read(sp);
         core.mem_write(sp, l);
         l = temp;
         temp = core.mem_read((sp + 1) & 0xffff);
@@ -1886,7 +1884,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xeb : EX DE, HL
     instructions[0xeb] = function () {
-        let temp = d;
+        var temp = d;
         d = h;
         h = temp;
         temp = e;
@@ -1906,7 +1904,7 @@ export function Z80(coreParameter: CoreParameter) {
         r = (r & 0x80) | (((r & 0x7f) + 1) & 0x7f);
 
         pc = (pc + 1) & 0xffff;
-        const opcode = core.mem_read(pc),
+        var opcode = core.mem_read(pc),
             func = ed_instructions[opcode];
 
         if (func) {
@@ -1934,7 +1932,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xf1 : POP AF
     instructions[0xf1] = function () {
-        const result = pop_word();
+        var result = pop_word();
         set_flags_register(result & 0xff);
         a = (result & 0xff00) >>> 8;
     };
@@ -1994,14 +1992,14 @@ export function Z80(coreParameter: CoreParameter) {
         r = (r & 0x80) | (((r & 0x7f) + 1) & 0x7f);
 
         pc = (pc + 1) & 0xffff;
-        const opcode = core.mem_read(pc),
+        var opcode = core.mem_read(pc),
             func = dd_instructions[opcode];
 
         if (func) {
             // Rather than copy and paste all the IX instructions into IY instructions,
             //  what we'll do is sneakily copy IY into IX, run the IX instruction,
             //  and then copy the result into IY and restore the old IX.
-            const temp = ix;
+            var temp = ix;
             ix = iy;
             //func = func.bind(this);
             func();
@@ -2037,7 +2035,7 @@ export function Z80(coreParameter: CoreParameter) {
     ///  there are not very many valid ED-prefixed opcodes in the Z80,
     ///  and many of the ones that are valid are not documented.
     ///////////////////////////////////////////////////////////////////////////////
-    const ed_instructions: any[] = [];
+    let ed_instructions:any[] = [];
     // 0x40 : IN B, (C)
     ed_instructions[0x40] = function () {
         b = do_in((b << 8) | c);
@@ -2053,7 +2051,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x43 : LD (nn), BC
     ed_instructions[0x43] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2092,7 +2090,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x4b : LD BC, (nn)
     ed_instructions[0x4b] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2130,7 +2128,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x53 : LD (nn), DE
     ed_instructions[0x53] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2174,7 +2172,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x5b : LD DE, (nn)
     ed_instructions[0x5b] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2214,7 +2212,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x63 : LD (nn), HL (Undocumented)
     ed_instructions[0x63] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2236,8 +2234,8 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x67 : RRD
     ed_instructions[0x67] = function () {
-        let hl_value = core.mem_read(l | (h << 8));
-        const temp1 = hl_value & 0x0f, temp2 = a & 0x0f;
+        var hl_value = core.mem_read(l | (h << 8));
+        var temp1 = hl_value & 0x0f, temp2 = a & 0x0f;
         hl_value = ((hl_value & 0xf0) >>> 4) | (temp2 << 4);
         a = (a & 0xf0) | temp1;
         core.mem_write(l | (h << 8), hl_value);
@@ -2264,7 +2262,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x6b : LD HL, (nn) (Undocumented)
     ed_instructions[0x6b] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2286,8 +2284,8 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0x6f : RLD
     ed_instructions[0x6f] = function () {
-        let hl_value = core.mem_read(l | (h << 8));
-        const temp1 = hl_value & 0xf0, temp2 = a & 0x0f;
+        var hl_value = core.mem_read(l | (h << 8));
+        var temp1 = hl_value & 0xf0, temp2 = a & 0x0f;
         hl_value = ((hl_value & 0x0f) << 4) | temp2;
         a = (a & 0xf0) | (temp1 >>> 4);
         core.mem_write(l | (h << 8), hl_value);
@@ -2314,7 +2312,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x73 : LD (nn), SP
     ed_instructions[0x73] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2349,7 +2347,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x7b : LD SP, (nn)
     ed_instructions[0x7b] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= core.mem_read(pc) << 8;
 
@@ -2473,7 +2471,7 @@ export function Z80(coreParameter: CoreParameter) {
     /// The undocumented instructions here are those that deal with only one byte
     ///  of the two-byte IX register; the bytes are designed IXH and IXL here.
     ///////////////////////////////////////////////////////////////////////////////
-    const dd_instructions: (() => void)[] = [];
+    let dd_instructions: (() => void)[] = [];
     // 0x09 : ADD IX, BC
     dd_instructions[0x09] = function () {
         do_ix_add(c | (b << 8));
@@ -2492,7 +2490,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x22 : LD (nn), IX
     dd_instructions[0x22] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= (core.mem_read(pc) << 8);
 
@@ -2523,7 +2521,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x2a : LD IX, (nn)
     dd_instructions[0x2a] = function () {
         pc = (pc + 1) & 0xffff;
-        let address = core.mem_read(pc);
+        var address = core.mem_read(pc);
         pc = (pc + 1) & 0xffff;
         address |= (core.mem_read(pc) << 8);
 
@@ -2550,21 +2548,21 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x34 : INC (IX+n)
     dd_instructions[0x34] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc)),
+        var offset = get_signed_offset_byte(core.mem_read(pc)),
             value = core.mem_read((offset + ix) & 0xffff);
         core.mem_write((offset + ix) & 0xffff, do_inc(value));
     };
     // 0x35 : DEC (IX+n)
     dd_instructions[0x35] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc)),
+        var offset = get_signed_offset_byte(core.mem_read(pc)),
             value = core.mem_read((offset + ix) & 0xffff);
         core.mem_write((offset + ix) & 0xffff, do_dec(value));
     };
     // 0x36 : LD (IX+n), n
     dd_instructions[0x36] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         pc = (pc + 1) & 0xffff;
         core.mem_write((ix + offset) & 0xffff, core.mem_read(pc));
     };
@@ -2583,7 +2581,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x46 : LD B, (IX+n)
     dd_instructions[0x46] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         b = core.mem_read((ix + offset) & 0xffff);
     };
     // 0x4c : LD C, IXH (Undocumented)
@@ -2597,7 +2595,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x4e : LD C, (IX+n)
     dd_instructions[0x4e] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         c = core.mem_read((ix + offset) & 0xffff);
     };
     // 0x54 : LD D, IXH (Undocumented)
@@ -2611,7 +2609,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x56 : LD D, (IX+n)
     dd_instructions[0x56] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         d = core.mem_read((ix + offset) & 0xffff);
     };
     // 0x5c : LD E, IXH (Undocumented)
@@ -2625,7 +2623,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x5e : LD E, (IX+n)
     dd_instructions[0x5e] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         e = core.mem_read((ix + offset) & 0xffff);
     };
     // 0x60 : LD IXH, B (Undocumented)
@@ -2655,7 +2653,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x66 : LD H, (IX+n)
     dd_instructions[0x66] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         h = core.mem_read((ix + offset) & 0xffff);
     };
     // 0x67 : LD IXH, A (Undocumented)
@@ -2689,7 +2687,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x6e : LD L, (IX+n)
     dd_instructions[0x6e] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         l = core.mem_read((ix + offset) & 0xffff);
     };
     // 0x6f : LD IXL, A (Undocumented)
@@ -2699,43 +2697,43 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x70 : LD (IX+n), B
     dd_instructions[0x70] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         core.mem_write((ix + offset) & 0xffff, b);
     };
     // 0x71 : LD (IX+n), C
     dd_instructions[0x71] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         core.mem_write((ix + offset) & 0xffff, c);
     };
     // 0x72 : LD (IX+n), D
     dd_instructions[0x72] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         core.mem_write((ix + offset) & 0xffff, d);
     };
     // 0x73 : LD (IX+n), E
     dd_instructions[0x73] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         core.mem_write((ix + offset) & 0xffff, e);
     };
     // 0x74 : LD (IX+n), H
     dd_instructions[0x74] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         core.mem_write((ix + offset) & 0xffff, h);
     };
     // 0x75 : LD (IX+n), L
     dd_instructions[0x75] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         core.mem_write((ix + offset) & 0xffff, l);
     };
     // 0x77 : LD (IX+n), A
     dd_instructions[0x77] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         core.mem_write((ix + offset) & 0xffff, a);
     };
     // 0x7c : LD A, IXH (Undocumented)
@@ -2749,7 +2747,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x7e : LD A, (IX+n)
     dd_instructions[0x7e] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         a = core.mem_read((ix + offset) & 0xffff);
     };
     // 0x84 : ADD A, IXH (Undocumented)
@@ -2763,7 +2761,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x86 : ADD A, (IX+n)
     dd_instructions[0x86] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_add(core.mem_read((ix + offset) & 0xffff));
     };
     // 0x8c : ADC A, IXH (Undocumented)
@@ -2777,7 +2775,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x8e : ADC A, (IX+n)
     dd_instructions[0x8e] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_adc(core.mem_read((ix + offset) & 0xffff));
     };
     // 0x94 : SUB IXH (Undocumented)
@@ -2791,7 +2789,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x96 : SUB A, (IX+n)
     dd_instructions[0x96] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_sub(core.mem_read((ix + offset) & 0xffff));
     };
     // 0x9c : SBC IXH (Undocumented)
@@ -2805,7 +2803,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0x9e : SBC A, (IX+n)
     dd_instructions[0x9e] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_sbc(core.mem_read((ix + offset) & 0xffff));
     };
     // 0xa4 : AND IXH (Undocumented)
@@ -2819,7 +2817,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0xa6 : AND A, (IX+n)
     dd_instructions[0xa6] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_and(core.mem_read((ix + offset) & 0xffff));
     };
     // 0xac : XOR IXH (Undocumented)
@@ -2833,7 +2831,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0xae : XOR A, (IX+n)
     dd_instructions[0xae] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_xor(core.mem_read((ix + offset) & 0xffff));
     };
     // 0xb4 : OR IXH (Undocumented)
@@ -2847,7 +2845,7 @@ export function Z80(coreParameter: CoreParameter) {
     // 0xb6 : OR A, (IX+n)
     dd_instructions[0xb6] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_or(core.mem_read((ix + offset) & 0xffff));
     };
     // 0xbc : CP IXH (Undocumented)
@@ -2861,33 +2859,32 @@ export function Z80(coreParameter: CoreParameter) {
     // 0xbe : CP A, (IX+n)
     dd_instructions[0xbe] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         do_cp(core.mem_read((ix + offset) & 0xffff));
     };
     // 0xcb : CB Prefix (IX bit instructions)
     dd_instructions[0xcb] = function () {
         pc = (pc + 1) & 0xffff;
-        const offset = get_signed_offset_byte(core.mem_read(pc));
+        var offset = get_signed_offset_byte(core.mem_read(pc));
         pc = (pc + 1) & 0xffff;
-        const opcode = core.mem_read(pc);
-        let value;
+        var opcode = core.mem_read(pc), value;
 
         // As with the "normal" CB prefix, we implement the DDCB prefix
         //  by decoding the opcode directly, rather than using a table.
         if (opcode < 0x40) {
             // Shift and rotate instructions.
-            const ddcb_functions = [do_rlc, do_rrc, do_rl, do_rr,
+            var ddcb_functions = [do_rlc, do_rrc, do_rl, do_rr,
                 do_sla, do_sra, do_sll, do_srl];
 
             // Most of the opcodes in this range are not valid,
             //  so we map this opcode onto one of the ones that is.
-            const func = ddcb_functions[(opcode & 0x38) >>> 3];
+            var func = ddcb_functions[(opcode & 0x38) >>> 3];
             value = func(core.mem_read((ix + offset) & 0xffff));
 
             core.mem_write((ix + offset) & 0xffff, value);
         }
         else {
-            const bit_number = (opcode & 0x38) >>> 3;
+            var bit_number = (opcode & 0x38) >>> 3;
 
             if (opcode < 0x80) {
                 // BIT
@@ -2937,7 +2934,7 @@ export function Z80(coreParameter: CoreParameter) {
     };
     // 0xe3 : EX (SP), IX
     dd_instructions[0xe3] = function () {
-        const temp = ix;
+        var temp = ix;
         ix = core.mem_read(sp);
         ix |= core.mem_read((sp + 1) & 0xffff) << 8;
         core.mem_write(sp, temp & 0xff);
@@ -2963,7 +2960,7 @@ export function Z80(coreParameter: CoreParameter) {
     ///  additional cycles might be added to these values.
     /// The total number of cycles is the return value of run_instruction().
     ///////////////////////////////////////////////////////////////////////////////
-    const cycle_counts = [
+    let cycle_counts = [
         4, 10, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4,
         8, 10, 7, 6, 4, 4, 7, 4, 12, 11, 7, 6, 4, 4, 7, 4,
         7, 10, 16, 6, 4, 4, 7, 4, 7, 11, 16, 6, 4, 4, 7, 4,
@@ -2982,7 +2979,7 @@ export function Z80(coreParameter: CoreParameter) {
         5, 10, 10, 4, 10, 11, 7, 11, 5, 6, 10, 4, 10, 0, 7, 11
     ];
 
-    const cycle_counts_ed = [
+    let cycle_counts_ed = [
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -3001,7 +2998,7 @@ export function Z80(coreParameter: CoreParameter) {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     ];
 
-    const cycle_counts_cb = [
+    let cycle_counts_cb = [
         8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
         8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
         8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
@@ -3020,7 +3017,7 @@ export function Z80(coreParameter: CoreParameter) {
         8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8
     ];
 
-    const cycle_counts_dd = [
+    let cycle_counts_dd = [
         0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0,
         0, 14, 20, 10, 8, 8, 11, 0, 0, 15, 20, 10, 8, 8, 11, 0,

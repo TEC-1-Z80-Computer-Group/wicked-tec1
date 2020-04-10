@@ -1,22 +1,23 @@
 {
+    "include": [
+        "./src/**/*",
+        "assets", "z80.ts-1", "worker.ts-1"
+    ],
     "compilerOptions": {
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "newLine": "LF",
-      "outDir": "./lib/",
-      "target": "es6",
-      "sourceMap": true,
-      "declaration": true,
-      "jsx": "preserve",
-      "lib": [
-        "es2017",
-        "dom"
-      ],
-      "strict": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "noImplicitReturns": true,
-      "noImplicitAny": true,
-      "noFallthroughCasesInSwitch": true
+        "lib": [
+            "dom",
+            "es2015",
+            "es2016",
+            "es2017",
+            "es2018",
+            "esnext",
+            "esnext.asynciterable"
+        ],
+        "jsx": "react",
+        "strict": true,
+        "noImplicitAny": true,
     },
-  }
+    "files": [
+        "custom.d.ts",
+    ]
+}
