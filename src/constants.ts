@@ -22,4 +22,3 @@ export const keyMap: KeyMap = {
   ArrowDown: 0x11,
   ArrowUp: 0x10,
 };
-

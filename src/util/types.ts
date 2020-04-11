@@ -3,10 +3,10 @@ export interface BaseComponent {
     requestRender(): any;
     observedProperties: string[] | null;
     element: BaseElement;
-    render(props:any): any;
-    [prop:string]: any;
+    render(props: any): any;
+    [prop: string]: any;
   }
 
   export interface BaseElement extends Element {
-    [prop:string]: any;
+    [prop: string]: any;
   }

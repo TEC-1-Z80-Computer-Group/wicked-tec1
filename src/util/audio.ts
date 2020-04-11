@@ -1,4 +1,4 @@
-var AudioContext = (window as any).AudioContext // Default
+const AudioContext = (window as any).AudioContext // Default
     || (window as any).webkitAudioContext // Safari and old versions of Chrome
     || false;
 
