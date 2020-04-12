@@ -1,25 +1,26 @@
 import * as React from "react";
 import styled from "styled-components";
-import { SevenSeg } from "./seven-seg";
+import { Digit } from "./digit";
+import { Stylable } from "../types";
 
-interface SevenSegDisplayProps {
+interface DigitPaneProps extends Stylable {
   display: number[];
 }
 
-const BaseSevenSegDisplay = ({ display, className }: Stylable) => {
+const BaseDigitPane = ({ display, className }: DigitPaneProps) => {
   return (
     <div className={`${className} seven-seg-display`}>
       {display.map((segs: number, index: number) => (
-        <SevenSeg
+        <Digit
           key={index}
-          marginLeft={index == 1 ? "2.2%" : ""}
+          marginLeft={index == 1 ? "4.9%" : ""}
           segments={segs}
-        ></SevenSeg>
+        ></Digit>
       ))}
     </div>
   );
 };
 
-export const SevenSegDisplay = styled(BaseSevenSegDisplay)`
+export const DigitPane = styled(BaseDigitPane)`
   white-space: nowrap;
 `;

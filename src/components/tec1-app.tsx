@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { audioInit, audioPlay, audioValue } from "../util/audio";
 import MemoryMap from "nrf-intel-hex";
-import { keyMap } from "../constants";
+import { keyCodes } from "../constants";
 import { Stylable, CPUMessage, MemoryMessage } from "../types";
 import { Tec1Header } from "./tec1-header";
 import { Tec1Main } from "./tec1-main";
@@ -16,8 +16,6 @@ import {
 const anchor = document.createElement("a");
 
 const BaseTec1App = ({ className }: Stylable) => {
-  const [digits, setDigits] = React.useState(0);
-  const [segments, setSegments] = React.useState(0);
   const [display, setDisplay] = React.useState(Array(6).fill(0));
   const [shiftLocked, setShiftLocked] = React.useState(false);
   const [classic, setClassic] = React.useState(
@@ -37,7 +35,13 @@ const BaseTec1App = ({ className }: Stylable) => {
     postWorkerMessage({ type: "HIDDEN", value: isHidden() });
   };
 
-  const handleCode = (code: string, shiftKey?: boolean) => {
+  const handleChangeLayout = (event: any) => {
+    const checked = event.target.checked;
+    setClassic(checked);
+    localStorage.setItem("classic", String(checked));
+  };
+
+  const handleCode = (code: string) => {
     audioInit();
     if (code === "Escape") {
       postWorkerMessage({ type: "RESET" });
@@ -45,15 +49,19 @@ const BaseTec1App = ({ className }: Stylable) => {
     } else if (code === "ShiftLock") {
       setShiftLocked(!shiftLocked);
       return true;
-    } else if (code in keyMap) {
-      const keyCode = keyMap[code];
+    } else if (code in keyCodes) {
+      const keyCode = keyCodes[code];
       if (keyCode == null) return false;
       const bit5 = 0b00100000;
       const mask = ~bit5;
       let keyCode1 = keyCode & mask;
-      if (!shiftLocked && !shiftKey) keyCode1 = keyCode1 | bit5;
+      if (!shiftLocked) keyCode1 = keyCode1 | bit5;
       postWorkerMessage({ type: "SET_INPUT_VALUE", port: 0, value: keyCode1 });
-      postWorkerMessage({ type: "SET_KEY_VALUE", code: keyCode1, pressed: true });
+      postWorkerMessage({
+        type: "SET_KEY_VALUE",
+        code: keyCode1,
+        pressed: true,
+      });
       postWorkerMessage({ type: "NMI" });
       return true;
     }
@@ -61,19 +69,24 @@ const BaseTec1App = ({ className }: Stylable) => {
   };
 
   const handleKeyDown = (event: any) => {
-    if (handleCode(event.code, event.shiftKey)) {
+    if (event.key === "Shift") {
+      setShiftLocked(true);
+    } else if (handleCode(event.code)) {
       event.preventDefault();
     } else {
       console.log(event, event.code, event.key);
     }
   };
 
+  const handleKeyUp = (event: any) => {
+    if (event.key === "Shift") {
+      setShiftLocked(false);
+    }
+  };
+
   const receiveMessage = (event: { data: CPUMessage | MemoryMessage }) => {
     if (event.data.type === "POST_OUTPORTS") {
-      const { buffer, display, wavelength } = event.data;
-      const view = new Uint8Array(buffer);
-      setDigits(view[1]);
-      setSegments(view[2]);
+      const { display, wavelength } = event.data;
       setDisplay([...new Uint8Array(display)]);
       const frequency = wavelength ? 500000 / wavelength : 0;
       audioValue(frequency);
@@ -103,34 +116,26 @@ const BaseTec1App = ({ className }: Stylable) => {
     const worker0 = new Worker("../worker/worker.ts");
     setWorker(worker0);
     worker0.onmessage = receiveMessage;
-    // worker0.postMessage({ type: "INIT" });
+    worker0.postMessage({ type: "INIT" });
 
     document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keyup", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
     addVisibilityListener(handleVisibility);
     return () => {
       if (worker) {
         worker.terminate();
       }
       document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("keyup", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
       removeVisiblityListener(handleVisibility);
     };
   }, []);
 
-  const handleChangeLayout = (event: any) => {
-    const checked = event.target.checked;
-    setClassic(checked);
-    localStorage.setItem("classic", String(checked));
-  };
-
   return (
-    <div className={`${className} tec1-app`} tabIndex={0} onKeyDown={handleKeyDown}>
+    <div className={`${className} tec1-app`}>
       {worker && <Tec1Header worker={worker} />}
       <Tec1Main
         classic={classic}
-        digits={digits}
-        segments={segments}
         display={display}
         shiftLocked={shiftLocked}
         handleCode={handleCode}
@@ -146,4 +151,11 @@ const BaseTec1App = ({ className }: Stylable) => {
   );
 };
 
-export const Tec1App = styled(BaseTec1App)``;
+export const Tec1App = styled(BaseTec1App)`
+  outline: none;
+  margin: 20px;
+  margin-right: auto;
+  margin-left: auto;
+  display: inline-block;
+  position: relative;
+`;

@@ -14,7 +14,7 @@ const BaseTec1Footer = ({
   handleChangeLayout,
   className,
 }: Tec1FooterProps) => {
-  const [speed, setSpeed] = React.useState(localStorage.getItem("speed"));
+  const [speed, setSpeed] = React.useState('50');
 
   const postSpeed = (speed: string) => {
     setSpeed(speed);
@@ -38,7 +38,7 @@ const BaseTec1Footer = ({
   };
 
   React.useEffect(() => {
-    const s = localStorage.getItem("speed") || '100';
+    const s = localStorage.getItem("speed") || '50';
     postSpeed(s);
     changeROM("MON-1");
   }, []);

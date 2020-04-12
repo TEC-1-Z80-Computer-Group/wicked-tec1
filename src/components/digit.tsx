@@ -5,12 +5,12 @@ import { Stylable } from "../types";
 const getFill = (segments: number, mask: number) =>
   segments & mask ? "red" : "#320000";
 
-interface SevenSegProps extends Stylable {
-  marginLeft: number;
+interface DigitProps extends Stylable {
+  marginLeft: string;
   segments: number;
 }
 
-const BaseSevenSeg = ({ segments, className }: SevenSegProps) => {
+const BaseDigit = ({ segments, className }: DigitProps) => {
   return (
     <div className={`${className} seven-seg`}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -1 12 20">
@@ -50,8 +50,8 @@ const BaseSevenSeg = ({ segments, className }: SevenSegProps) => {
   );
 };
 
-export const SevenSeg = styled(BaseSevenSeg)`
+export const Digit = styled(BaseDigit)`
   display: inline-block;
   width: 4.34%;
-  margin-left: ${(props) => props.marginLeft || "1.6%"};
+  margin-left: ${(props) => props.marginLeft || "2.3%"};
 `;

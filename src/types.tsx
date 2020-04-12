@@ -29,7 +29,11 @@ export interface CPUMessage extends Message {
   wavelength: any;
 }
 
-export interface KeyMap {
-  [key: string]: number | null;
+export interface KeyNamesMap {
+  [key: string]: string;
+}
+
+export interface KeyCodesMap {
+  [key: string]: number;
 }
 
