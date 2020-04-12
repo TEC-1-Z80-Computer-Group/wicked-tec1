@@ -22,6 +22,10 @@ export function audioValue(value: number) {
     }
 }
 
+export function isAudioInitialised() {
+    return audioCtx != null;
+}
+
 export function isAudioPlaying() {
     return active;
 }

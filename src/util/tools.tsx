@@ -1,4 +1,4 @@
-import { Thunk } from "./types";
+import { Thunk } from "../types";
 
 export const throttle = (thunk: Thunk, limit: number) => {
   let wait = false;

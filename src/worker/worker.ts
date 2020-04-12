@@ -2,7 +2,7 @@
 
 import { Z80 } from "./z80";
 import MemoryMap from "nrf-intel-hex";
-import { throttle } from "../util";
+import { throttle } from "../util/tools";
 
 let running = false;
 // eslint-disable-next-line prefer-const
@@ -27,30 +27,6 @@ const cpu = Z80({
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   io_write: ioWrite,
 });
-
-function updateDisplay() {
-  const digits = outPorts[1];
-  const segments = outPorts[2];
-  let mask = 0x01;
-  for (let i = 0; i < 6; i++) {
-    if (digits & mask) {
-      display[i] = segments;
-    }
-    mask = mask << 1;
-  }
-}
-
-function updatePorts(port: number, value: number) {
-  if (port === 1) {
-    const speaker1 = value >> 7;
-    if (speaker1 === 1 && speaker === 0) {
-      wavelength = cycles;
-      cycles = 0;
-    }
-    speaker = speaker1;
-  }
-  if (cycles > 10000) wavelength = 0;
-}
 
 function getPortsBuffer() {
   const buffer = new ArrayBuffer(4);
@@ -78,8 +54,6 @@ const postOutPorts = throttle(() => {
       type: "POST_OUTPORTS",
       buffer,
       display,
-      speaker,
-      wavelength,
       pc: cpu.getPC(),
     },
     [buffer, display]
@@ -89,14 +63,48 @@ const postOutPorts = throttle(() => {
 function ioWrite(port: number, value: number) {
   const port1 = port & 0xff;
   outPorts[port1] = value;
-  updateDisplay();
-  updatePorts(port1, value);
+  const digits = outPorts[1];
+  const segments = outPorts[2];
+  let mask = 0x01;
+  for (let i = 0; i < 6; i++) {
+    if (digits & mask) {
+      display[i] = segments;
+    }
+    mask = mask << 1;
+  }
+  let wavelengthChanged = false;
+  if (port1 === 1) {
+    const speaker1 = value >> 7;
+    if (speaker1 === 1 && speaker === 0) {
+      if (wavelength !== cycles) {
+        wavelengthChanged = true;
+      }
+      wavelength = cycles;
+      cycles = 0;
+    }
+    speaker = speaker1;
+  }
+  if (cycles > 10000) {
+    if (wavelength !== 0) {
+      wavelengthChanged = true;
+    }
+    wavelength = 0;
+  }
+  if (wavelengthChanged) {
+    (self as any).postMessage(
+      {
+        type: "POST_WAVELENGTH",
+        wavelength,
+      },
+      []
+    );
+  }
   postOutPorts();
 }
 
 function* runGen() {
   while (true) {
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 1000; i++) {
       try {
         const count = cpu.run_instruction();
         cycles += count;
@@ -139,23 +147,19 @@ const resetRun = (reset: boolean) => {
 
 const doInit = () => {
   console.log("init");
-  // resetRun(true);
 };
 
 const doReset = () => {
-  console.log("resetting");
   resetRun(true);
 };
 
 const doSetInputValue = (event: any) => {
   const { port, value } = event.data;
-  console.log("setting input value", { port, value });
   inPorts[port] = value;
 };
 
 const doSetKeyValue = (event: any) => {
   const { code, pressed } = event.data;
-  console.log("setting key value", { code, pressed });
   inPorts[0] = code;
   const bit6 = 0b01000000;
   const bit6mask = ~bit6;
@@ -164,11 +168,9 @@ const doSetKeyValue = (event: any) => {
 
 const doSetSpeed = (event: any) => {
   speed = Number(event.data.value) / 100;
-  console.log("set speed", speed);
 };
 
 const doNMI = () => {
-  console.log("NMI");
   cpu.interrupt(true, 0);
 };
 

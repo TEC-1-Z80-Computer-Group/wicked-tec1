@@ -1,9 +1,14 @@
 import * as React from "react";
 import styled from "styled-components";
-import { audioInit, audioPlay, audioValue } from "../util/audio";
+import {
+  audioInit,
+  audioPlay,
+  audioValue,
+  isAudioInitialised,
+} from "../util/audio";
 import MemoryMap from "nrf-intel-hex";
 import { keyCodes, layouts } from "../constants";
-import { Stylable, CPUMessage, MemoryMessage } from "../types";
+import { Stylable } from "../types";
 import { Tec1Header } from "./tec1-header";
 import { Tec1Main } from "./tec1-main";
 import { Tec1Footer } from "./tec1-footer";
@@ -18,7 +23,7 @@ const anchor = document.createElement("a");
 const BaseTec1App = ({ className }: Stylable) => {
   const [display, setDisplay] = React.useState(Array(6).fill(0));
   const [shiftLocked, setShiftLocked] = React.useState(false);
-  const [worker] = React.useState(new Worker("../worker/worker.ts"));
+  const [worker, setWorker] = React.useState<Worker>();
   const [layout, setLayout] = React.useState(
     localStorage.getItem("layout") || layouts.classic
   );
@@ -35,7 +40,7 @@ const BaseTec1App = ({ className }: Stylable) => {
   };
 
   const handleChangeLayout = (newLayout: string) => {
-    const n = newLayout?.toUpperCase() || '';
+    const n = newLayout?.toUpperCase() || "";
     if (!n) {
       setLayout(layouts.classic);
     } else if (n in layouts) {
@@ -88,13 +93,15 @@ const BaseTec1App = ({ className }: Stylable) => {
     }
   };
 
-  const receiveMessage = (event: { data: CPUMessage | MemoryMessage }) => {
+  const receiveMessage = (event: { data: any }) => {
     if (event.data.type === "POST_OUTPORTS") {
-      const { display, wavelength } = event.data;
+      const { display } = event.data;
       setDisplay([...new Uint8Array(display)]);
+    } else if (event.data.type === "POST_WAVELENGTH") {
+      const { wavelength } = event.data;
       const frequency = wavelength ? 500000 / wavelength : 0;
       audioValue(frequency);
-    } else {
+    } else if (event.data.type === "POST_MEMORY") {
       const { from, buffer } = event.data;
       const memMap = new MemoryMap();
       const bytes = new Uint8Array(buffer);
@@ -115,6 +122,8 @@ const BaseTec1App = ({ className }: Stylable) => {
   };
 
   React.useEffect(() => {
+    const worker = new Worker("../worker/worker.ts");
+    setWorker(worker);
     worker.onmessage = receiveMessage;
     worker.postMessage({ type: "INIT" });
 
@@ -136,7 +145,9 @@ const BaseTec1App = ({ className }: Stylable) => {
   }, [layout]);
 
   React.useEffect(() => {
-    audioPlay(!hidden);
+    if (isAudioInitialised()) {
+      audioPlay(!hidden);
+    }
     postWorkerMessage({ type: "HIDDEN", value: hidden });
   }, [worker, hidden]);
 
