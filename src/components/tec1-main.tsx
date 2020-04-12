@@ -5,29 +5,27 @@ import { KeyButton } from "./key-button";
 import { DigitPane } from "./digit-pane";
 import tec1Image from "../../assets/TEC-1x.jpg";
 import { Stylable, EventFunc } from "../types";
-import { keyMaps } from "../constants";
 
 interface Tec1MainProps extends Stylable {
-  classic: boolean;
+  layout: string;
   display: any[];
   shiftLocked: boolean;
   handleCode: EventFunc;
 }
 
 const BaseTec1Main = ({
-  classic,
+  layout,
   display,
   shiftLocked,
   handleCode,
   className,
 }: Tec1MainProps) => {
-  const keyMap = classic ? keyMaps.classic : keyMaps.jelic;
   return (
     <div className={`${className} tec1-main`}>
       <div className="digit-pane">
         <DigitPane display={display} />
       </div>
-      <Keypad onClick={handleCode} keyMap={keyMap} />
+      <Keypad onClick={handleCode} keyMap={layout} />
       <KeyButton
         code={"Escape"}
         text={"R"}

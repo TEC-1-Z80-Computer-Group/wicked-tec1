@@ -49,9 +49,8 @@ export const keyNames: KeyNamesMap = {
   "+": "Plus",
 };
 
-export const keyMaps = {
-  classic: "@37BFG26AE-152D+048C",
-  modern: "@CDEFG89AB-4567+0123",
-  jelic: "@798AG456B-123C+0FED",
+export const layouts: KeyNamesMap = {
+  CLASSIC: "@37BFG26AE-159D+048C",
+  MODERN: "@CDEFG89AB-4567+0123",
+  JELIC: "@798AG456B-123C+0FED",
 };
-

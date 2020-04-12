@@ -19,7 +19,6 @@ interface KeypadProps extends Stylable {
 }
 
 const BaseKeypad = ({ keyMap, onClick, className }: KeypadProps) => {
-  console.log({ onClick });
   return (
     <div className={`${className} keypad-classic`}>
       {Array(5 * 4)

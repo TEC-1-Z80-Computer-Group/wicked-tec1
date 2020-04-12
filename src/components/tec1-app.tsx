@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { audioInit, audioPlay, audioValue } from "../util/audio";
 import MemoryMap from "nrf-intel-hex";
-import { keyCodes } from "../constants";
+import { keyCodes, layouts } from "../constants";
 import { Stylable, CPUMessage, MemoryMessage } from "../types";
 import { Tec1Header } from "./tec1-header";
 import { Tec1Main } from "./tec1-main";
@@ -18,10 +18,11 @@ const anchor = document.createElement("a");
 const BaseTec1App = ({ className }: Stylable) => {
   const [display, setDisplay] = React.useState(Array(6).fill(0));
   const [shiftLocked, setShiftLocked] = React.useState(false);
-  const [classic, setClassic] = React.useState(
-    localStorage.getItem("classic") === "true"
+  const [worker] = React.useState(new Worker("../worker/worker.ts"));
+  const [layout, setLayout] = React.useState(
+    localStorage.getItem("layout") || layouts.classic
   );
-  const [worker, setWorker] = React.useState<Worker>();
+  const [hidden, setHidden] = React.useState(false);
 
   const postWorkerMessage = (message: any) => {
     if (worker) {
@@ -30,15 +31,18 @@ const BaseTec1App = ({ className }: Stylable) => {
   };
 
   const handleVisibility = () => {
-    console.log("isHidden", isHidden());
-    audioPlay(!isHidden());
-    postWorkerMessage({ type: "HIDDEN", value: isHidden() });
+    setHidden(isHidden());
   };
 
-  const handleChangeLayout = (event: any) => {
-    const checked = event.target.checked;
-    setClassic(checked);
-    localStorage.setItem("classic", String(checked));
+  const handleChangeLayout = (newLayout: string) => {
+    const n = newLayout?.toUpperCase() || '';
+    if (!n) {
+      setLayout(layouts.classic);
+    } else if (n in layouts) {
+      setLayout(layouts[n]);
+    } else {
+      setLayout(n);
+    }
   };
 
   const handleCode = (code: string) => {
@@ -60,7 +64,7 @@ const BaseTec1App = ({ className }: Stylable) => {
       postWorkerMessage({
         type: "SET_KEY_VALUE",
         code: keyCode1,
-        pressed: true,
+        pressed: !shiftLocked,
       });
       postWorkerMessage({ type: "NMI" });
       return true;
@@ -111,12 +115,8 @@ const BaseTec1App = ({ className }: Stylable) => {
   };
 
   React.useEffect(() => {
-    setClassic(localStorage.getItem("classic") === "true");
-
-    const worker0 = new Worker("../worker/worker.ts");
-    setWorker(worker0);
-    worker0.onmessage = receiveMessage;
-    worker0.postMessage({ type: "INIT" });
+    worker.onmessage = receiveMessage;
+    worker.postMessage({ type: "INIT" });
 
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
@@ -131,20 +131,29 @@ const BaseTec1App = ({ className }: Stylable) => {
     };
   }, []);
 
+  React.useEffect(() => {
+    localStorage.setItem("layout", layout);
+  }, [layout]);
+
+  React.useEffect(() => {
+    audioPlay(!hidden);
+    postWorkerMessage({ type: "HIDDEN", value: hidden });
+  }, [worker, hidden]);
+
   return (
     <div className={`${className} tec1-app`}>
       {worker && <Tec1Header worker={worker} />}
       <Tec1Main
-        classic={classic}
+        layout={layout}
         display={display}
         shiftLocked={shiftLocked}
         handleCode={handleCode}
       />
       {worker && (
         <Tec1Footer
-          classic={classic}
           worker={worker}
-          handleChangeLayout={handleChangeLayout}
+          layout={layout}
+          onChangeLayout={handleChangeLayout}
         />
       )}
     </div>

@@ -1,20 +1,20 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Stylable, EventFunc } from "../types";
+import { Stylable } from "../types";
 
 interface Tec1FooterProps extends Stylable {
-  classic: boolean;
   worker: any;
-  handleChangeLayout: EventFunc;
+  layout: string;
+  onChangeLayout: (layout: string) => void;
 }
 
 const BaseTec1Footer = ({
-  classic,
   worker,
-  handleChangeLayout,
+  layout,
+  onChangeLayout,
   className,
 }: Tec1FooterProps) => {
-  const [speed, setSpeed] = React.useState('50');
+  const [speed, setSpeed] = React.useState("50");
 
   const postSpeed = (speed: string) => {
     setSpeed(speed);
@@ -38,7 +38,7 @@ const BaseTec1Footer = ({
   };
 
   React.useEffect(() => {
-    const s = localStorage.getItem("speed") || '50';
+    const s = localStorage.getItem("speed") || "50";
     postSpeed(s);
     changeROM("MON-1");
   }, []);
@@ -46,6 +46,17 @@ const BaseTec1Footer = ({
   const handleChangeROM = async (event: any) => {
     const name = event.target.value || "MON-1";
     changeROM(name);
+  };
+
+  const handleLayoutButton = () => {
+    const newLayout = window.prompt(
+      `The keys on the keypad are arranged into rows following this string.
+@ is AD, G is GO. Case is ignored.
+To restore the original TEC-1 layout clear the text.
+`,
+      layout
+    );
+    onChangeLayout(newLayout);
   };
 
   const handleChangeSpeed = (event: any) => {
@@ -57,34 +68,33 @@ const BaseTec1Footer = ({
   return (
     <div className={`${className} tec1-footer`}>
       <div className={`${className} first-row`}>
-        <label htmlFor="rom-select">ROM</label>
-        <select id="rom-select" onChange={handleChangeROM}>
-          <option>MON-1</option>
-          <option>MON-1A</option>
-          <option>MON-1B</option>
-          <option>MON-2</option>
-          <option>JMON</option>
-        </select>
+        <label htmlFor="rom-select">
+          ROM
+          <select id="rom-select" onChange={handleChangeROM}>
+            <option>MON-1</option>
+            <option>MON-1A</option>
+            <option>MON-1B</option>
+            <option>MON-2</option>
+            <option>JMON</option>
+          </select>
+        </label>
         <div>
-          <input
-            id="key-layout"
-            type="checkbox"
-            checked={classic}
-            onChange={handleChangeLayout}
-          />
-          <label htmlFor="key-layout">original key layout</label>
+          <button type="button" onClick={handleLayoutButton}>
+            Keypad layout
+          </button>
         </div>
         <div>
-          <label htmlFor="speed">Speed</label>
-          Speed
-          <input
-            id="speed"
-            type="range"
-            min="0"
-            max="99"
-            value={speed || "50"}
-            onChange={handleChangeSpeed}
-          />
+          <label htmlFor="speed">
+            Speed
+            <input
+              id="speed"
+              type="range"
+              min="0"
+              max="99"
+              value={speed || "50"}
+              onChange={handleChangeSpeed}
+            />
+          </label>
         </div>
       </div>
       <p>MON 1 Restart:</p>

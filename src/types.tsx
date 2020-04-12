@@ -37,3 +37,5 @@ export interface KeyCodesMap {
   [key: string]: number;
 }
 
+export type Thunk = () => void;
+

@@ -30,7 +30,7 @@ module.exports = {
   rules: {
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/explicit-function-return-type": 0,
-    "max-lines": ["error", { max: 200, skipComments: true }],
+    "max-lines": ["error", { max: 250, skipComments: true }],
     "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
   },
 };

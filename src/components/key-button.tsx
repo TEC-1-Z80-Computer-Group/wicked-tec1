@@ -34,6 +34,7 @@ export const KeyButton = styled(BaseKeyButton)`
   width: 20px;
   left: ${(props) => props.left}px;
   top: ${(props) => props.top}px;
+  user-select: none; 
 
   & > div {
     width: 20px;

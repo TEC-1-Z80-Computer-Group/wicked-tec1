@@ -2,6 +2,7 @@
 
 import { Z80 } from "./z80";
 import MemoryMap from "nrf-intel-hex";
+import { throttle } from "../util";
 
 let running = false;
 // eslint-disable-next-line prefer-const
@@ -23,14 +24,8 @@ const cpu = Z80({
   io_read: (port: number) => {
     return inPorts[port & 0xff];
   },
-  io_write: (port: number, value: number) => {
-    const port1 = port & 0xff;
-    outPorts[port1] = value;
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    updateDisplay();
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    postOutPorts(port1, value);
-  },
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  io_write: ioWrite,
 });
 
 function updateDisplay() {
@@ -45,14 +40,16 @@ function updateDisplay() {
   }
 }
 
-function updateMemory(rom: string) {
-  const blocks = MemoryMap.fromHex(rom);
-  for (const address of blocks.keys()) {
-    const block = blocks.get(address);
-    for (let i = 0; i < block.length; i++) {
-      memory[i + address] = block[i];
+function updatePorts(port: number, value: number) {
+  if (port === 1) {
+    const speaker1 = value >> 7;
+    if (speaker1 === 1 && speaker === 0) {
+      wavelength = cycles;
+      cycles = 0;
     }
+    speaker = speaker1;
   }
+  if (cycles > 10000) wavelength = 0;
 }
 
 function getPortsBuffer() {
@@ -73,37 +70,9 @@ function getDisplayBuffer() {
   return buffer;
 }
 
-function readMemory(from: number, size: number) {
-  const buffer = new ArrayBuffer(size);
-  const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < size; i++) {
-    bytes[i] = memory[i + from];
-  }
-  (self as any).postMessage(
-    {
-      type: "POST_MEMORY",
-      from,
-      size,
-      buffer,
-    },
-    [buffer]
-  );
-}
-
-function postOutPorts(port: number, value: number) {
+const postOutPorts = throttle(() => {
   const buffer = getPortsBuffer();
   const display = getDisplayBuffer();
-
-  if (port === 1) {
-    const speaker1 = value >> 7;
-    if (speaker1 === 1 && speaker === 0) {
-      wavelength = cycles;
-      cycles = 0;
-    }
-    speaker = speaker1;
-  }
-  if (cycles > 10000) wavelength = 0;
-
   (self as any).postMessage(
     {
       type: "POST_OUTPORTS",
@@ -115,11 +84,19 @@ function postOutPorts(port: number, value: number) {
     },
     [buffer, display]
   );
+}, 100);
+
+function ioWrite(port: number, value: number) {
+  const port1 = port & 0xff;
+  outPorts[port1] = value;
+  updateDisplay();
+  updatePorts(port1, value);
+  postOutPorts();
 }
 
 function* runGen() {
   while (true) {
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 10000; i++) {
       try {
         const count = cpu.run_instruction();
         cycles += count;
@@ -142,9 +119,9 @@ function run() {
   if (pending) return;
   if (!running) return;
   iter.next();
-  const delay = Math.floor((1 - Number(speed)) * 30);
   if (running) {
     pending = true;
+    const delay = Math.floor((1 - Number(speed)) * 30);
     setTimeout(function () {
       pending = false;
       run();
@@ -153,59 +130,110 @@ function run() {
 }
 
 const resetRun = (reset: boolean) => {
-  if (reset){
+  if (reset) {
     cpu.reset();
   }
-  // running = true;
-  // run();
-}
+  running = true;
+  run();
+};
 
-self.onmessage = (event: any) => {
-  if (event.data.type === "INIT") {
-    resetRun(true);
-  // } else if (event.data.type === "PAUSE") {
-  //   if (active) {
-  //     active = false;
-  //     running = false;
-  //   } else {
-  //     active = true;
-  //     running = true;
-  //     run();
-  //   }
-  } else if (event.data.type === "RESET") {
-    console.log("resetting");
-    resetRun(true);
-  } else if (event.data.type === "SET_INPUT_VALUE") {
-    const { port, value } = event.data;
-    inPorts[port] = value;
-  } else if (event.data.type === "SET_KEY_VALUE") {
-    const { code, pressed } = event.data;
-    inPorts[0] = code;
-    const bit6 = 0b01000000;
-    const bit6mask = ~bit6;
-    inPorts[3] = (inPorts[3] & bit6mask) | (!pressed ? bit6 : 0);
-  } else if (event.data.type === "SET_SPEED") {
-    speed = Number(event.data.value) / 100;
-    console.log("set speed", speed);
-  } else if (event.data.type === "NMI") {
-    cpu.interrupt(true, 0);
-  } else if (event.data.type === "UPDATE_MEMORY") {
-    updateMemory(event.data.value);
-    resetRun(true);
-  } else if (event.data.type === "READ_MEMORY") {
-    readMemory(event.data.from, event.data.size);
-  } else if (event.data.type === "HIDDEN") {
-    const hidden = event.data.value;
-    if (hidden) {
-      running = false;
-    } else if (active) {
-      running = true;
-      run();
-      resetRun(false);
-    } else {
-      console.log("not active");
+const doInit = () => {
+  console.log("init");
+  // resetRun(true);
+};
+
+const doReset = () => {
+  console.log("resetting");
+  resetRun(true);
+};
+
+const doSetInputValue = (event: any) => {
+  const { port, value } = event.data;
+  console.log("setting input value", { port, value });
+  inPorts[port] = value;
+};
+
+const doSetKeyValue = (event: any) => {
+  const { code, pressed } = event.data;
+  console.log("setting key value", { code, pressed });
+  inPorts[0] = code;
+  const bit6 = 0b01000000;
+  const bit6mask = ~bit6;
+  inPorts[3] = (inPorts[3] & bit6mask) | (!pressed ? bit6 : 0);
+};
+
+const doSetSpeed = (event: any) => {
+  speed = Number(event.data.value) / 100;
+  console.log("set speed", speed);
+};
+
+const doNMI = () => {
+  console.log("NMI");
+  cpu.interrupt(true, 0);
+};
+
+const doUpdateMemory = (event: any) => {
+  console.log("memory updated");
+  const rom = event.data.value;
+  const blocks = MemoryMap.fromHex(rom);
+  for (const address of blocks.keys()) {
+    const block = blocks.get(address);
+    for (let i = 0; i < block.length; i++) {
+      memory[i + address] = block[i];
     }
+  }
+  resetRun(true);
+};
+
+const doReadMemory = (event: any) => {
+  console.log("read memory");
+  const from = event.data.from;
+  const size = event.data.size;
+  const buffer = new ArrayBuffer(size);
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < size; i++) {
+    bytes[i] = memory[i + from];
+  }
+  (self as any).postMessage(
+    {
+      type: "POST_MEMORY",
+      from,
+      size,
+      buffer,
+    },
+    [buffer]
+  );
+};
+
+const doProcessHidden = (event: any) => {
+  const hidden = event.data.value;
+  if (hidden) {
+    running = false;
+  } else if (active) {
+    resetRun(false);
+  } else {
+    console.log("not active");
   }
 };
 
-
+self.onmessage = (event: any) => {
+  if (event.data.type === "INIT") {
+    doInit();
+  } else if (event.data.type === "RESET") {
+    doReset();
+  } else if (event.data.type === "SET_INPUT_VALUE") {
+    doSetInputValue(event);
+  } else if (event.data.type === "SET_KEY_VALUE") {
+    doSetKeyValue(event);
+  } else if (event.data.type === "SET_SPEED") {
+    doSetSpeed(event);
+  } else if (event.data.type === "NMI") {
+    doNMI();
+  } else if (event.data.type === "UPDATE_MEMORY") {
+    doUpdateMemory(event);
+  } else if (event.data.type === "READ_MEMORY") {
+    doReadMemory(event);
+  } else if (event.data.type === "HIDDEN") {
+    doProcessHidden(event);
+  }
+};
