@@ -34,11 +34,13 @@ To restore the original TEC-1 layout clear the text.
 `,
       layout
     );
-    onChangeLayout(newLayout || '');
+    if (newLayout != null) {
+      onChangeLayout(newLayout || '');
+    }
   };
 
   const handleChangeSpeed = (event: any) => {
-    const {value} = event.target;
+    const { value } = event.target;
     localStorage.setItem('speed', String(value));
     postSpeed(value);
   };
