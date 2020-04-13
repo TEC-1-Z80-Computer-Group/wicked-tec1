@@ -34,7 +34,7 @@ const BaseKeypad = ({ keyMap, onClick, className }: KeypadProps) => {
               code={code}
               text={getKeyText(key)}
               left={438 + 31 * x}
-              top={239 + 31 * y}
+              top={239 + 30.5 * y}
               onClick={onClick}
             />
           );
