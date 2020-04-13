@@ -40,12 +40,6 @@ const BaseTec1 = ({ className }: Stylable) => {
     setHidden(isHidden());
   };
 
-  const handleInteraction = () => {
-    if (!isAudioInitialised()) {
-      // audioInit();
-    }
-  };
-
   const handleChangeLayout = (newLayout: string) => {
     const n = newLayout?.toUpperCase() || '';
     if (!n) {
@@ -167,7 +161,7 @@ const BaseTec1 = ({ className }: Stylable) => {
   }, [worker, hidden]);
 
   return (
-    <div className={`${className} tec1-app`} onMouseEnter={handleInteraction}>
+    <div className={`${className} tec1-app`}>
       {worker && <Header worker={worker} />}
       <Main
         layout={layout}
