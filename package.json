@@ -9,7 +9,8 @@
     "stubs": "node ./stubby/index.js",
     "build": "parcel build ./src/index.html --public-url '/items'",
     "test": "npm run lint && jest --coverage",
-    "test-dev": "jest"
+    "test-dev": "jest",
+    "test-travis": "jest --coverage"
   },
   "keywords": [
     "parcel",
