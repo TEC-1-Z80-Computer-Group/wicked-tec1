@@ -10,7 +10,7 @@
     "build": "parcel build ./src/index.html --public-url '/items'",
     "test": "npm run lint && jest --coverage",
     "test-dev": "jest",
-    "test-travis": "jest --coverage"
+    "test-travis": "jest"
   },
   "keywords": [
     "parcel",
