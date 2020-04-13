@@ -6,21 +6,21 @@ import {
   audioPlay,
   audioValue,
   isAudioInitialised,
-} from "../util/audio";
-import { keyCodes, layouts } from "../constants";
-import { Stylable } from "../types";
-import { Tec1Header } from "./tec1-header";
-import { Tec1Main } from "./tec1-main";
-import { Tec1Footer } from "./tec1-footer";
+} from "../../util/audio";
+import { keyCodes, layouts } from "../../constants";
+import { Stylable } from "../../types";
+import { Header } from "./header";
+import { Main } from "./main";
+import { Footer } from "./footer";
 import {
   isHidden,
   addVisibilityListener,
   removeVisiblityListener,
-} from "../util/page-visibility";
+} from "../../util/page-visibility";
 
 const anchor = document.createElement("a");
 
-const BaseTec1App = ({ className }: Stylable) => {
+const BaseTec1 = ({ className }: Stylable) => {
   const [display, setDisplay] = React.useState(Array(6).fill(0));
   const [shiftLocked, setShiftLocked] = React.useState(false);
   const [worker, setWorker] = React.useState<Worker>();
@@ -122,7 +122,7 @@ const BaseTec1App = ({ className }: Stylable) => {
   };
 
   React.useEffect(() => {
-    const worker = new Worker("../worker/worker.ts");
+    const worker = new Worker("../../worker/worker.ts");
     setWorker(worker);
     worker.onmessage = receiveMessage;
     worker.postMessage({ type: "INIT" });
@@ -153,15 +153,15 @@ const BaseTec1App = ({ className }: Stylable) => {
 
   return (
     <div className={`${className} tec1-app`}>
-      {worker && <Tec1Header worker={worker} />}
-      <Tec1Main
+      {worker && <Header worker={worker} />}
+      <Main
         layout={layout}
         display={display}
         shiftLocked={shiftLocked}
         handleCode={handleCode}
       />
       {worker && (
-        <Tec1Footer
+        <Footer
           worker={worker}
           layout={layout}
           onChangeLayout={handleChangeLayout}
@@ -171,7 +171,7 @@ const BaseTec1App = ({ className }: Stylable) => {
   );
 };
 
-export const Tec1App = styled(BaseTec1App)`
+export const Tec1 = styled(BaseTec1)`
   outline: none;
   margin: 20px;
   margin-right: auto;

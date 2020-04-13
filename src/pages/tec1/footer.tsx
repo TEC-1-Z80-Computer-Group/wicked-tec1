@@ -1,19 +1,19 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Stylable } from '../types';
+import { Stylable } from '../../types';
 
-interface Tec1FooterProps extends Stylable {
+interface FooterProps extends Stylable {
   worker: any;
   layout: string;
   onChangeLayout: (layout: string) => void;
 }
 
-const BaseTec1Footer = ({
+const BaseFooter = ({
   worker,
   layout,
   onChangeLayout,
   className,
-}: Tec1FooterProps) => {
+}: FooterProps) => {
   const [speed, setSpeed] = React.useState("50");
 
   const postSpeed = (speed: string) => {
@@ -25,14 +25,14 @@ const BaseTec1Footer = ({
     // import must be a static string for parcelJS
     const p =
       name === "MON-1A"
-        ? import("../roms/MON-1A")
+        ? import("../../roms/MON-1A")
         : name === "MON-1B"
-        ? import("../roms/MON-1B")
+        ? import("../../roms/MON-1B")
         : name === "MON-2"
-        ? import("../roms/MON-2")
+        ? import("../../roms/MON-2")
         : name === "JMON"
-        ? import("../roms/JMON")
-        : import("../roms/MON-1");
+        ? import("../../roms/JMON")
+        : import("../../roms/MON-1");
     const result = await p;
     worker.postMessage({ type: "UPDATE_MEMORY", value: result.ROM });
   };
@@ -113,7 +113,7 @@ To restore the original TEC-1 layout clear the text.
   );
 };
 
-export const Tec1Footer = styled(BaseTec1Footer)`
+export const Footer = styled(BaseFooter)`
   .first-row {
     display: flex;
     flex-direction: row;

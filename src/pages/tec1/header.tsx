@@ -1,12 +1,12 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Stylable } from "../types";
+import { Stylable } from "../../types";
 
-interface Tec1HeaderProps extends Stylable {
+interface HeaderProps extends Stylable {
   worker: any;
 }
 
-const BaseTec1Header = ({ worker, className }: Tec1HeaderProps) => {
+const BaseHeader = ({ worker, className }: HeaderProps) => {
   const handleUpload = (event: any) => {
     const {files} = event.target;
     if (files == null || files.length === 0) return;
@@ -42,7 +42,7 @@ const BaseTec1Header = ({ worker, className }: Tec1HeaderProps) => {
     </div>
   );
 };
-export const Tec1Header = styled(BaseTec1Header)`
+export const Header = styled(BaseHeader)`
   display: flex;
   justify-content: space-between;
   align-items: center;

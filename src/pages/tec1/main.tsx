@@ -1,25 +1,25 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Keypad } from "./keypad";
-import { KeyButton } from "./key-button";
-import { DigitPane } from "./digit-pane";
-import tec1Image from "../../assets/TEC-1x.jpg";
-import { Stylable, EventFunc } from "../types";
+import { Keypad } from "../../components/keypad";
+import { KeyButton } from "../../components/key-button";
+import { DigitPane } from "../../components/digit-pane";
+import tec1Image from "../../../assets/TEC-1x.jpg";
+import { Stylable, EventFunc } from "../../types";
 
-interface Tec1MainProps extends Stylable {
+interface MainProps extends Stylable {
   layout: string;
   display: any[];
   shiftLocked: boolean;
   handleCode: EventFunc;
 }
 
-const BaseTec1Main = ({
+const BaseMain = ({
   layout,
   display,
   shiftLocked,
   handleCode,
   className,
-}: Tec1MainProps) => {
+}: MainProps) => {
   return (
     <div className={`${className} tec1-main`}>
       <div className="digit-pane">
@@ -44,7 +44,7 @@ const BaseTec1Main = ({
     </div>
   );
 };
-export const Tec1Main = styled(BaseTec1Main)`
+export const Main = styled(BaseMain)`
   width: 600px;
   height: 375px;
   background-image: url(${tec1Image});

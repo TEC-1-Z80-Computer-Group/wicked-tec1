@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { AnyObj } from './types';
-import { Tec1App } from './components/tec1-app';
+import { Tec1 } from './pages/tec1/tec1';
 
 const GlobalStyle = createGlobalStyle`
 html, body {
@@ -33,7 +33,7 @@ export const App: React.FC<any> = () => {
     <>
       <GlobalStyle />
       <ThemeProvider theme={customTheme}>
-        <Tec1App />
+        <Tec1 />
       </ThemeProvider>
     </>
   );
