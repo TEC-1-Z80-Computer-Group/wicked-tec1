@@ -1,6 +1,12 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable no-shadow */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
+/* eslint-disable no-alert */
 import * as React from "react";
 import styled from "styled-components";
-import { Stylable } from "../types";
+import { Stylable } from '../types';
 
 interface Tec1FooterProps extends Stylable {
   worker: any;
@@ -22,15 +28,15 @@ const BaseTec1Footer = ({
   };
 
   const changeROM = async (name: string) => {
-    //import must be a static string for parcelJS
+    // import must be a static string for parcelJS
     const p =
-      name == "MON-1A"
+      name === "MON-1A"
         ? import("../roms/MON-1A")
-        : name == "MON-1B"
+        : name === "MON-1B"
         ? import("../roms/MON-1B")
-        : name == "MON-2"
+        : name === "MON-2"
         ? import("../roms/MON-2")
-        : name == "JMON"
+        : name === "JMON"
         ? import("../roms/JMON")
         : import("../roms/MON-1");
     const result = await p;
@@ -56,11 +62,11 @@ To restore the original TEC-1 layout clear the text.
 `,
       layout
     );
-    onChangeLayout(newLayout);
+    onChangeLayout(newLayout || '');
   };
 
   const handleChangeSpeed = (event: any) => {
-    const value = event.target.value;
+    const {value} = event.target;
     localStorage.setItem("speed", String(value));
     postSpeed(value);
   };

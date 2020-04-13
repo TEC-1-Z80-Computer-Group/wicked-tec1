@@ -1,3 +1,6 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
 import * as React from "react";
 import styled from "styled-components";
 import { EventFunc, Stylable } from "../types";
@@ -34,7 +37,7 @@ export const KeyButton = styled(BaseKeyButton)`
   width: 20px;
   left: ${(props) => props.left}px;
   top: ${(props) => props.top}px;
-  user-select: none; 
+  user-select: none;
 
   & > div {
     width: 20px;

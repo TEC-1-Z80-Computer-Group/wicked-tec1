@@ -3,6 +3,8 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended", // Uses the recommended rules from @eslint-plugin-react
     "plugin:@typescript-eslint/recommended", // Uses the recommended rules from @typescript-eslint/eslint-plugin
+    "airbnb-base",
+    "prettier"
   ],
   env: {
     browser: true,

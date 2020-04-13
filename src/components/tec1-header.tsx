@@ -1,3 +1,6 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
 import * as React from "react";
 import styled from "styled-components";
 import { Stylable } from "../types";
@@ -8,7 +11,7 @@ interface Tec1HeaderProps extends Stylable {
 
 const BaseTec1Header = ({ worker, className }: Tec1HeaderProps) => {
   const handleUpload = (event: any) => {
-    const files = event.target.files;
+    const {files} = event.target;
     if (files == null || files.length === 0) return;
     const file = files[0];
     const reader = new FileReader();

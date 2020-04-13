@@ -1,3 +1,6 @@
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
+/* eslint-disable import/prefer-default-export */
 import * as React from "react";
 import styled from "styled-components";
 import { Digit } from "./digit";
@@ -13,7 +16,7 @@ const BaseDigitPane = ({ display, className }: DigitPaneProps) => {
       {display.map((segs: number, index: number) => (
         <Digit
           key={index}
-          marginLeft={index == 1 ? "4.9%" : ""}
+          marginLeft={index === 1 ? "4.9%" : ""}
           segments={segs}
         ></Digit>
       ))}

@@ -2,7 +2,7 @@ import { StyledProps } from 'styled-components';
 
 // export interface Dict<T> { [key: string]: T }
 
-// export type AnyObj = { [key: string]: any };
+export type AnyObj = { [key: string]: any };
 
 export type EventFunc = (event: any) => void;
 

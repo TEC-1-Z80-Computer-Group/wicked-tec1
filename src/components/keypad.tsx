@@ -1,3 +1,6 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
 import * as React from "react";
 import styled from "styled-components";
 import { KeyButton } from "./key-button";
@@ -7,7 +10,7 @@ import { keyNames } from "../constants";
 const getKeyText = (key: string) => {
   if (key === "@") {
     return "AD";
-  } else if (key === "G") {
+  } if (key === "G") {
     return "GO";
   }
   return key;
