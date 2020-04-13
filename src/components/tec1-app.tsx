@@ -1,12 +1,17 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable no-shadow */
+/* eslint-disable no-bitwise */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
 import * as React from "react";
 import styled from "styled-components";
+import MemoryMap from "nrf-intel-hex";
 import {
   audioInit,
   audioPlay,
   audioValue,
   isAudioInitialised,
 } from "../util/audio";
-import MemoryMap from "nrf-intel-hex";
 import { keyCodes, layouts } from "../constants";
 import { Stylable } from "../types";
 import { Tec1Header } from "./tec1-header";
@@ -55,16 +60,16 @@ const BaseTec1App = ({ className }: Stylable) => {
     if (code === "Escape") {
       postWorkerMessage({ type: "RESET" });
       return true;
-    } else if (code === "ShiftLock") {
+    } if (code === "ShiftLock") {
       setShiftLocked(!shiftLocked);
       return true;
-    } else if (code in keyCodes) {
+    } if (code in keyCodes) {
       const keyCode = keyCodes[code];
       if (keyCode == null) return false;
       const bit5 = 0b00100000;
       const mask = ~bit5;
       let keyCode1 = keyCode & mask;
-      if (!shiftLocked) keyCode1 = keyCode1 | bit5;
+      if (!shiftLocked) keyCode1 |= bit5;
       postWorkerMessage({ type: "SET_INPUT_VALUE", port: 0, value: keyCode1 });
       postWorkerMessage({
         type: "SET_KEY_VALUE",

@@ -1,7 +1,18 @@
+/* eslint-disable no-console */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-plusplus */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-shadow */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/extensions */
+/* eslint-disable no-bitwise */
 /* eslint-disable @typescript-eslint/camelcase */
 
-import { Z80 } from "./z80";
 import MemoryMap from "nrf-intel-hex";
+import { Z80 } from "./z80";
 import { throttle } from "../util/tools";
 
 let running = false;
@@ -20,11 +31,10 @@ let wavelength = 0;
 
 const cpu = Z80({
   mem_read: (addr: number) => memory[addr],
-  mem_write: (addr: number, value: number) => (memory[addr] = value),
+  mem_write: (addr: number, value: number) => {memory[addr] = value},
   io_read: (port: number) => {
     return inPorts[port & 0xff];
   },
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   io_write: ioWrite,
 });
 
@@ -70,7 +80,7 @@ function ioWrite(port: number, value: number) {
     if (digits & mask) {
       display[i] = segments;
     }
-    mask = mask << 1;
+    mask <<= 1;
   }
   let wavelengthChanged = false;
   if (port1 === 1) {
