@@ -42,7 +42,7 @@ const BaseTec1 = ({ className }: Stylable) => {
 
   const handleInteraction = () => {
     if (!isAudioInitialised()) {
-      audioInit();
+      // audioInit();
     }
   };
 
