@@ -1,8 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable no-shadow */
-/* eslint-disable no-bitwise */
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/extensions */
 import * as React from "react";
 import styled from "styled-components";
 import MemoryMap from "nrf-intel-hex";

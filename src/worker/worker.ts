@@ -1,23 +1,9 @@
-/* eslint-disable no-console */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-restricted-globals */
-/* eslint-disable no-plusplus */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-shadow */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/extensions */
-/* eslint-disable no-bitwise */
-/* eslint-disable @typescript-eslint/camelcase */
-
 import MemoryMap from "nrf-intel-hex";
 import { Z80 } from "./z80";
 import { throttle } from "../util/tools";
 
 let running = false;
-// eslint-disable-next-line prefer-const
-let active = true;
+const active = true;
 let speed = 30;
 
 let cycles = 0;

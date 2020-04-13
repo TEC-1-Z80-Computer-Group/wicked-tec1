@@ -1,5 +1,3 @@
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/extensions */
 import { KeyNamesMap, KeyCodesMap } from "./types";
 
 export const keyCodes: KeyCodesMap = {

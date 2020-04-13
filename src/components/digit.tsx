@@ -1,7 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/extensions */
-/* eslint-disable no-bitwise */
 import * as React from "react";
 import styled from "styled-components";
 import { Stylable } from "../types";

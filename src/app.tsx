@@ -1,6 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/extensions */
 import * as React from 'react';
 
 import { ThemeProvider, createGlobalStyle } from 'styled-components';

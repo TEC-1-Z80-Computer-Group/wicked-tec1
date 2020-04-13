@@ -1,9 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable no-shadow */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/extensions */
-/* eslint-disable no-alert */
 import * as React from "react";
 import styled from "styled-components";
 import { Stylable } from '../types';

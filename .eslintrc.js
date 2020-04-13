@@ -4,7 +4,7 @@ module.exports = {
     "plugin:react/recommended", // Uses the recommended rules from @eslint-plugin-react
     "plugin:@typescript-eslint/recommended", // Uses the recommended rules from @typescript-eslint/eslint-plugin
     "airbnb-base",
-    "prettier"
+    "prettier",
   ],
   env: {
     browser: true,
@@ -30,9 +30,28 @@ module.exports = {
     },
   },
   rules: {
-    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/camelcase": 0,
     "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "func-names": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/prefer-default-export": 0,
+    "import/no-unresolved": 0,
     "max-lines": ["error", { max: 250, skipComments: true }],
+    "no-alert": 0,
+    "no-bitwise": 0,
+    "no-shadow": 0,
+    "no-nested-ternary": 0,
     "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "no-console": 0,
+    "no-restricted-syntax": 0,
+    "no-restricted-globals": 0,
+    "no-plusplus": 0,
+    "no-use-before-define": 0,
+    "no-shadow": 0,
+    "prefer-destructuring": 0,
   },
 };

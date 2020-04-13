@@ -1,42 +1,32 @@
 /* eslint-disable max-lines */
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-param-reassign */
-/* eslint-disable no-use-before-define */
-/* eslint-disable func-names */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-bitwise */
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable @typescript-eslint/camelcase */
-// /////////////////////////////////////////////////////////////////////////////
-// / @file Z80.js
-// /
-// / @brief Emulator for the Zilog Z80 microprocessor
-// /
-// / @author Matthew Howell
-// /
-// / @remarks
-// /  This module is a simple, straightforward instruction interpreter.
-// /   There is no fancy dynamic recompilation or cycle-accurate emulation.
-// /   The author believes that this should be sufficient for any emulator that
-// /   would be feasible to write in JavaScript anyway.
-// /  The code and the comments in this file assume that the reader is familiar
-// /   with the Z80 architecture. If you're not, here are some references I use:
-// /  http://clrhome.org/table/ - Z80 instruction set tables
-// /  http://www.zilog.com/docs/z80/um0080.pdf - The official manual
-// /  http://www.myquest.nl/z80undocumented/z80-documented-v0.91.pdf
-// /   - The Undocumented Z80, Documented
-// /
-// / @copyright (c) 2013 Matthew Howell
-// /  This code is released under the MIT license,
-// /  a copy of which is available in the associated README.md file,
-// /  or at http://opensource.org/licenses/MIT
-// /////////////////////////////////////////////////////////////////////////////
 
-// /////////////////////////////////////////////////////////////////////////////
-// / We'll begin with the object constructor and the public API functions.
-// /////////////////////////////////////////////////////////////////////////////
+// @file Z80.js
+//
+// @brief Emulator for the Zilog Z80 microprocessor
+//
+// @author Matthew Howell
+//
+// @remarks
+//  This module is a simple, straightforward instruction interpreter.
+//   There is no fancy dynamic recompilation or cycle-accurate emulation.
+//   The author believes that this should be sufficient for any emulator that
+//   would be feasible to write in JavaScript anyway.
+//  The code and the comments in this file assume that the reader is familiar
+//   with the Z80 architecture. If you're not, here are some references I use:
+//  http://clrhome.org/table/ - Z80 instruction set tables
+//  http://www.zilog.com/docs/z80/um0080.pdf - The official manual
+//  http://www.myquest.nl/z80undocumented/z80-documented-v0.91.pdf
+//   - The Undocumented Z80, Documented
+//
+// @copyright (c) 2013 Matthew Howell
+//  This code is released under the MIT license,
+//  a copy of which is available in the associated README.md file,
+//  or at http://opensource.org/licenses/MIT
+
+// We'll begin with the object constructor and the public API functions.
 
 interface CoreParameter {
   mem_read: (addr: number) => any;
@@ -284,11 +274,11 @@ export function Z80(coreParameter: CoreParameter) {
     cycle_counter = state.cycle_counter;
   }
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / @public reset
-  // /
-  // / @brief Re-initialize the processor as if a reset or power on had occured
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // @public reset
+  //
+  // @brief Re-initialize the processor as if a reset or power on had occured
+  // ////////////////////////////////////////////////////////////////////////////
   const reset = function () {
     // These registers are the ones that have predictable states
     //  immediately following a power-on or a reset.
@@ -316,15 +306,15 @@ export function Z80(coreParameter: CoreParameter) {
     halted = false;
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / @public run_instruction
-  // /
-  // / @brief Runs a single instruction
-  // /
-  // / @return The number of T cycles the instruction took to run,
-  // /          plus any time that went into handling interrupts that fired
-  // /          while this instruction was executing
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // @public run_instruction
+  //
+  // @brief Runs a single instruction
+  //
+  // @return The number of T cycles the instruction took to run,
+  //          plus any time that went into handling interrupts that fired
+  //          while this instruction was executing
+  // ////////////////////////////////////////////////////////////////////////////
   const run_instruction = function () {
     if (!halted) {
       // If the previous instruction was a DI or an EI,
@@ -371,14 +361,14 @@ export function Z80(coreParameter: CoreParameter) {
     return 1;
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / @public interrupt
-  // /
-  // / @brief Simulates pulsing the processor's INT (or NMI) pin
-  // /
-  // / @param non_maskable - true if this is a non-maskable interrupt
-  // / @param data - the value to be placed on the data bus, if needed
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // @public interrupt
+  //
+  // @brief Simulates pulsing the processor's INT (or NMI) pin
+  //
+  // @param non_maskable - true if this is a non-maskable interrupt
+  // @param data - the value to be placed on the data bus, if needed
+  // ////////////////////////////////////////////////////////////////////////////
   const interrupt = function (non_maskable: boolean, data: number) {
     if (non_maskable) {
       // The high bit of R is not affected by this increment,
@@ -429,11 +419,11 @@ export function Z80(coreParameter: CoreParameter) {
     }
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / The public API functions end here.
-  // /
-  // / What begins here are just general utility functions, used variously.
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // The public API functions end here.
+  //
+  // What begins here are just general utility functions, used variously.
+  // ////////////////////////////////////////////////////////////////////////////
   const decode_instruction = function (opcode: number) {
     // The register-to-register loads and ALU instructions
     //  are all so uniform that we can decode them directly
@@ -881,12 +871,12 @@ export function Z80(coreParameter: CoreParameter) {
     return retval;
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / Now, the way most instructions work in this emulator is that they set up
-  // /  their operands according to their addressing mode, and then they call a
-  // /  utility function that handles all variations of that instruction.
-  // / Those utility functions begin here.
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // Now, the way most instructions work in this emulator is that they set up
+  //  their operands according to their addressing mode, and then they call a
+  //  utility function that handles all variations of that instruction.
+  // Those utility functions begin here.
+  // ////////////////////////////////////////////////////////////////////////////
   const do_conditional_absolute_jump = function (condition: boolean) {
     // This function implements the JP [condition],nn instructions.
     if (condition) {
@@ -1444,12 +1434,12 @@ export function Z80(coreParameter: CoreParameter) {
     ix = result;
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / This table contains the implementations for the instructions that weren't
-  // /  implemented directly in the decoder function (everything but the 8-bit
-  // /  register loads and the accumulator ALU instructions, in other words).
-  // / Similar tables for the ED and DD/FD prefixes follow this one.
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // This table contains the implementations for the instructions that weren't
+  //  implemented directly in the decoder function (everything but the 8-bit
+  //  register loads and the accumulator ALU instructions, in other words).
+  // Similar tables for the ED and DD/FD prefixes follow this one.
+  // ////////////////////////////////////////////////////////////////////////////
   const instructions: any[] = [];
 
   // 0x00 : NOP
@@ -2311,11 +2301,11 @@ export function Z80(coreParameter: CoreParameter) {
     do_reset(0x38);
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / This table of ED opcodes is pretty sparse;
-  // /  there are not very many valid ED-prefixed opcodes in the Z80,
-  // /  and many of the ones that are valid are not documented.
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // This table of ED opcodes is pretty sparse;
+  //  there are not very many valid ED-prefixed opcodes in the Z80,
+  //  and many of the ones that are valid are not documented.
+  // ////////////////////////////////////////////////////////////////////////////
   const ed_instructions: any[] = [];
   // 0x40 : IN B, (C)
   ed_instructions[0x40] = function () {
@@ -2747,12 +2737,12 @@ export function Z80(coreParameter: CoreParameter) {
     }
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / Like ED, this table is quite sparse,
-  // /  and many of the opcodes here are also undocumented.
-  // / The undocumented instructions here are those that deal with only one byte
-  // /  of the two-byte IX register; the bytes are designed IXH and IXL here.
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // Like ED, this table is quite sparse,
+  //  and many of the opcodes here are also undocumented.
+  // The undocumented instructions here are those that deal with only one byte
+  //  of the two-byte IX register; the bytes are designed IXH and IXL here.
+  // ////////////////////////////////////////////////////////////////////////////
   const dd_instructions: (() => void)[] = [];
   // 0x09 : ADD IX, BC
   dd_instructions[0x09] = function () {
@@ -3237,12 +3227,12 @@ export function Z80(coreParameter: CoreParameter) {
     sp = ix;
   };
 
-  // /////////////////////////////////////////////////////////////////////////////
-  // / These tables contain the number of T cycles used for each instruction.
-  // / In a few special cases, such as conditional control flow instructions,
-  // /  additional cycles might be added to these values.
-  // / The total number of cycles is the return value of run_instruction().
-  // /////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////////////////////////////////////////////////
+  // These tables contain the number of T cycles used for each instruction.
+  // In a few special cases, such as conditional control flow instructions,
+  //  additional cycles might be added to these values.
+  // The total number of cycles is the return value of run_instruction().
+  // ////////////////////////////////////////////////////////////////////////////
   const cycle_counts = [
     4,
     10,
