@@ -1,10 +1,10 @@
-import * as React from "react";
-import styled from "styled-components";
-import { Keypad } from "../../components/keypad";
-import { KeyButton } from "../../components/key-button";
-import { DigitPane } from "../../components/digit-pane";
-import tec1Image from "../../../assets/TEC-1x.jpg";
-import { Stylable, EventFunc } from "../../types";
+import * as React from 'react';
+import styled from 'styled-components';
+import { Keypad } from '../../components/keypad';
+import { KeyButton } from '../../components/key-button';
+import { DigitPane } from '../../components/digit-pane';
+import tec1Image from '../../../assets/TEC-1x.jpg';
+import { Stylable, EventFunc } from '../../types';
 
 interface MainProps extends Stylable {
   layout: string;
@@ -27,15 +27,15 @@ const BaseMain = ({
       </div>
       <Keypad onClick={handleCode} keyMap={layout} />
       <KeyButton
-        code={"Escape"}
-        text={"R"}
+        code={'Escape'}
+        text={'R'}
         left={349}
         top={301}
         onClick={handleCode}
       />
       <KeyButton
-        code={"ShiftLock"}
-        text={"SH"}
+        code={'ShiftLock'}
+        text={'SH'}
         locked={shiftLocked}
         left={386}
         top={333}

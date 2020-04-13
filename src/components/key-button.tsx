@@ -1,6 +1,6 @@
-import * as React from "react";
-import styled from "styled-components";
-import { EventFunc, Stylable } from "../types";
+import * as React from 'react';
+import styled from 'styled-components';
+import { EventFunc, Stylable } from '../types';
 
 interface KeyButtonProps extends Stylable {
   code: string;
@@ -11,16 +11,20 @@ interface KeyButtonProps extends Stylable {
   onClick: EventFunc;
 }
 
-const BaseKeyButton = ({ code, locked, text, onClick, className }: KeyButtonProps) => {
+const BaseKeyButton = ({
+  code,
+  locked,
+  text,
+  onClick,
+  className,
+}: KeyButtonProps) => {
   const handleEvent = () => {
     onClick(code);
   };
 
   return (
     <div className={`${className} key-button`} onMouseDown={handleEvent}>
-      <div className={`${locked ? 'key-button-locked' : ''}`}>
-        {text}
-      </div>
+      <div className={`${locked ? 'key-button-locked' : ''}`}>{text}</div>
     </div>
   );
 };

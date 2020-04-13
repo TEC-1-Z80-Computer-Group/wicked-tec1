@@ -1,14 +1,14 @@
-import * as React from "react";
-import styled from "styled-components";
-import { KeyButton } from "./key-button";
-import { Stylable, EventFunc } from "../types";
-import { keyNames } from "../constants";
+import * as React from 'react';
+import styled from 'styled-components';
+import { KeyButton } from './key-button';
+import { Stylable, EventFunc } from '../types';
+import { keyNames } from '../constants';
 
 const getKeyText = (key: string) => {
-  if (key === "@") {
-    return "AD";
-  } if (key === "G") {
-    return "GO";
+  if (key === '@') {
+    return 'AD';
+  } if (key === 'G') {
+    return 'GO';
   }
   return key;
 };

@@ -1,4 +1,4 @@
-import { KeyNamesMap, KeyCodesMap } from "./types";
+import { KeyNamesMap, KeyCodesMap } from './types';
 
 export const keyCodes: KeyCodesMap = {
   Digit0: 0x00,
@@ -27,30 +27,30 @@ export const keyCodes: KeyCodesMap = {
 };
 
 export const keyNames: KeyNamesMap = {
-  "0": "Digit0",
-  "1": "Digit1",
-  "2": "Digit2",
-  "3": "Digit3",
-  "4": "Digit4",
-  "5": "Digit5",
-  "6": "Digit6",
-  "7": "Digit7",
-  "8": "Digit8",
-  "9": "Digit9",
-  A: "KeyA",
-  B: "KeyB",
-  C: "KeyC",
-  D: "KeyD",
-  E: "KeyE",
-  F: "KeyF",
-  "@": "Tab",
-  G: "Enter",
-  "-": "Minus",
-  "+": "Plus",
+  0: 'Digit0',
+  1: 'Digit1',
+  2: 'Digit2',
+  3: 'Digit3',
+  4: 'Digit4',
+  5: 'Digit5',
+  6: 'Digit6',
+  7: 'Digit7',
+  8: 'Digit8',
+  9: 'Digit9',
+  A: 'KeyA',
+  B: 'KeyB',
+  C: 'KeyC',
+  D: 'KeyD',
+  E: 'KeyE',
+  F: 'KeyF',
+  '@': 'Tab',
+  G: 'Enter',
+  '-': 'Minus',
+  '+': 'Plus',
 };
 
 export const layouts: KeyNamesMap = {
-  CLASSIC: "@37BFG26AE-159D+048C",
-  MODERN: "@CDEFG89AB-4567+0123",
-  JELIC: "@798AG456B-123C+0FED",
+  CLASSIC: '@37BFG26AE-159D+048C',
+  MODERN: '@CDEFG89AB-4567+0123',
+  JELIC: '@798AG456B-123C+0FED',
 };

@@ -1,58 +1,53 @@
-import MemoryMap from "nrf-intel-hex";
-import { Z80 } from "./z80";
-import { throttle } from "../util/tools";
+/* eslint-disable prefer-const */
+import MemoryMap from 'nrf-intel-hex';
+import { Z80Cpu, Z80 } from './z80';
+import { throttle } from '../util/tools';
+
+const sixtyfourK = 0x10000;
 
 let running = false;
 const active = true;
 let speed = 30;
 
 let cycles = 0;
-const buffer = new ArrayBuffer(0xffff);
-const memory = new Uint8Array(buffer).fill(0xff);
+const memory = new Uint8Array(new ArrayBuffer(sixtyfourK)).fill(0xff);
 const inPorts = Array(256).fill(0xff);
 const outPorts = Array(256).fill(0xff);
 const display = Array(6).fill(0);
 let speaker = 1;
 let wavelength = 0;
 
-const cpu = Z80({
-  mem_read: (addr: number) => memory[addr],
-  mem_write: (addr: number, value: number) => {memory[addr] = value},
-  io_read: (port: number) => {
-    return inPorts[port & 0xff];
+let cpu: Z80Cpu;
+
+const postAllMemory = throttle(
+  () => {
+    console.log(memory[0x800].toString(16));
+    const memMap = new MemoryMap();
+    const bytes = new Uint8Array(memory);
+    memMap.set(0, bytes);
+    const hexString = memMap.asHexString();
+
+    (self as any).postMessage({
+      type: 'POST_ALL_MEMORY',
+      memory: hexString,
+    });
   },
-  io_write: ioWrite,
-});
+  5 * 1000,
+  true
+);
 
-function getPortsBuffer() {
-  const buffer = new ArrayBuffer(4);
-  const view = new Uint8Array(buffer);
-  view[0] = outPorts[0];
-  view[1] = outPorts[1];
-  view[2] = outPorts[2];
-  return buffer;
-}
-
-function getDisplayBuffer() {
-  const buffer = new ArrayBuffer(6);
-  const view = new Uint8Array(buffer);
+const postDisplay = throttle(() => {
+  const displayBuffer = new ArrayBuffer(6);
+  const view = new Uint8Array(displayBuffer);
   for (let i = 0; i < 6; i++) {
     view[i] = display[i];
   }
-  return buffer;
-}
-
-const postOutPorts = throttle(() => {
-  const buffer = getPortsBuffer();
-  const display = getDisplayBuffer();
   (self as any).postMessage(
     {
-      type: "POST_OUTPORTS",
-      buffer,
-      display,
-      pc: cpu.getPC(),
+      type: 'POST_DISPLAY',
+      display: displayBuffer,
     },
-    [buffer, display]
+    [displayBuffer]
   );
 }, 100);
 
@@ -89,13 +84,13 @@ function ioWrite(port: number, value: number) {
   if (wavelengthChanged) {
     (self as any).postMessage(
       {
-        type: "POST_WAVELENGTH",
+        type: 'POST_WAVELENGTH',
         wavelength,
       },
       []
     );
   }
-  postOutPorts();
+  postDisplay();
 }
 
 function* runGen() {
@@ -142,7 +137,7 @@ const resetRun = (reset: boolean) => {
 };
 
 const doInit = () => {
-  console.log("init");
+  console.log('init');
 };
 
 const doReset = () => {
@@ -171,7 +166,7 @@ const doNMI = () => {
 };
 
 const doUpdateMemory = (event: any) => {
-  console.log("memory updated");
+  console.log('memory updated');
   const rom = event.data.value;
   const blocks = MemoryMap.fromHex(rom);
   for (const address of blocks.keys()) {
@@ -184,22 +179,22 @@ const doUpdateMemory = (event: any) => {
 };
 
 const doReadMemory = (event: any) => {
-  console.log("read memory");
+  console.log('read memory');
   const from = event.data.from;
   const size = event.data.size;
-  const buffer = new ArrayBuffer(size);
-  const bytes = new Uint8Array(buffer);
+  const buffer1 = new ArrayBuffer(size);
+  const bytes = new Uint8Array(buffer1);
   for (let i = 0; i < size; i++) {
     bytes[i] = memory[i + from];
   }
   (self as any).postMessage(
     {
-      type: "POST_MEMORY",
+      type: 'POST_MEMORY',
       from,
       size,
-      buffer,
+      buffer: buffer1,
     },
-    [buffer]
+    [buffer1]
   );
 };
 
@@ -210,28 +205,43 @@ const doProcessHidden = (event: any) => {
   } else if (active) {
     resetRun(false);
   } else {
-    console.log("not active");
+    console.log('not active');
   }
 };
 
 self.onmessage = (event: any) => {
-  if (event.data.type === "INIT") {
+  if (event.data.type === 'INIT') {
     doInit();
-  } else if (event.data.type === "RESET") {
+  } else if (event.data.type === 'RESET') {
     doReset();
-  } else if (event.data.type === "SET_INPUT_VALUE") {
+  } else if (event.data.type === 'SET_INPUT_VALUE') {
     doSetInputValue(event);
-  } else if (event.data.type === "SET_KEY_VALUE") {
+  } else if (event.data.type === 'SET_KEY_VALUE') {
     doSetKeyValue(event);
-  } else if (event.data.type === "SET_SPEED") {
+  } else if (event.data.type === 'SET_SPEED') {
     doSetSpeed(event);
-  } else if (event.data.type === "NMI") {
+  } else if (event.data.type === 'NMI') {
     doNMI();
-  } else if (event.data.type === "UPDATE_MEMORY") {
+  } else if (event.data.type === 'UPDATE_MEMORY') {
     doUpdateMemory(event);
-  } else if (event.data.type === "READ_MEMORY") {
+  } else if (event.data.type === 'READ_MEMORY') {
     doReadMemory(event);
-  } else if (event.data.type === "HIDDEN") {
+  } else if (event.data.type === 'HIDDEN') {
     doProcessHidden(event);
   }
 };
+
+cpu = Z80({
+  mem_read: (addr: number) => memory[addr],
+  mem_write: (addr: number, value: number) => {
+    const oldValue = memory[addr];
+    memory[addr] = value;
+    if (oldValue !== value) {
+      postAllMemory();
+    }
+  },
+  io_read: (port: number) => {
+    return inPorts[port & 0xff];
+  },
+  io_write: ioWrite,
+});

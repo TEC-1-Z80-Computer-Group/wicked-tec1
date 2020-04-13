@@ -1,15 +1,23 @@
-import { Thunk } from "../types";
+import { Thunk } from '../types';
 
-export const throttle = (thunk: Thunk, limit: number) => {
+export const throttle = (thunk: Thunk, limit: number, latest?: boolean) => {
   let wait = false;
   return () => {
     if (!wait) {
-      thunk();
+      if (!latest) thunk();
       wait = true;
-      setTimeout(function () {
+      setTimeout(() => {
         wait = false;
+        if (latest) thunk();
       }, limit);
     }
   };
 };
 
+export const debounce = (thunk: Thunk, limit: number) => {
+  let inDebounce = 0;
+  return () => {
+    clearTimeout(inDebounce);
+    inDebounce = setTimeout(() => thunk(), limit);
+  };
+};

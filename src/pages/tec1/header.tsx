@@ -1,6 +1,6 @@
-import * as React from "react";
-import styled from "styled-components";
-import { Stylable } from "../../types";
+import * as React from 'react';
+import styled from 'styled-components';
+import { Stylable } from '../../types';
 
 interface HeaderProps extends Stylable {
   worker: any;
@@ -13,17 +13,17 @@ const BaseHeader = ({ worker, className }: HeaderProps) => {
     const file = files[0];
     const reader = new FileReader();
     reader.onload = () =>
-      worker.postMessage({ type: "UPDATE_MEMORY", value: reader.result });
+      worker.postMessage({ type: 'UPDATE_MEMORY', value: reader.result });
     reader.readAsText(file);
   };
 
   const handleDownload = () => {
-    const pfrom = window.prompt("Start address (hex)", "0800");
-    const psize = window.prompt("Size (hex)", "1000");
+    const pfrom = window.prompt('Start address (hex)', '0800');
+    const psize = window.prompt('Size (hex)', '1000');
     if (pfrom != null && psize != null) {
       const from = parseInt(pfrom, 16);
       const size = parseInt(psize, 16);
-      worker.postMessage({ type: "READ_MEMORY", from, size });
+      worker.postMessage({ type: 'READ_MEMORY', from, size });
     }
   };
 
