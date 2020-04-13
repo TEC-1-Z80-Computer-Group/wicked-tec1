@@ -26,7 +26,7 @@ const BaseTec1 = ({ className }: Stylable) => {
   const [shiftLocked, setShiftLocked] = React.useState(false);
   const [worker, setWorker] = React.useState<Worker>();
   const [layout, setLayout] = React.useState(
-    localStorage.getItem('layout') || layouts.classic
+    localStorage.getItem('layout') || layouts.CLASSIC
   );
   const [hidden, setHidden] = React.useState(false);
 
@@ -49,7 +49,7 @@ const BaseTec1 = ({ className }: Stylable) => {
   const handleChangeLayout = (newLayout: string) => {
     const n = newLayout?.toUpperCase() || '';
     if (!n) {
-      setLayout(layouts.classic);
+      setLayout(layouts.CLASSIC);
     } else if (n in layouts) {
       setLayout(layouts[n]);
     } else {
