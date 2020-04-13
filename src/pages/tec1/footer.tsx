@@ -35,7 +35,7 @@ To restore the original TEC-1 layout clear the text.
       layout
     );
     if (newLayout != null) {
-      onChangeLayout(newLayout || '');
+      onChangeLayout(newLayout);
     }
   };
 
