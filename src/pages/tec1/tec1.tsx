@@ -22,6 +22,7 @@ import { ROM as Mon1BRom } from './MON-1B';
 const anchor = document.createElement('a');
 
 const BaseTec1 = ({ className }: Stylable) => {
+  const ref = React.useRef<HTMLInputElement>(null);
   const [display, setDisplay] = React.useState(Array(6).fill(0));
   const [shiftLocked, setShiftLocked] = React.useState(false);
   const [worker, setWorker] = React.useState<Worker>();
@@ -82,20 +83,6 @@ const BaseTec1 = ({ className }: Stylable) => {
     return false;
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === 'Shift') {
-      setShiftLocked(true);
-    } else if (handleCode(event.code)) {
-      event.preventDefault();
-    }
-  };
-
-  const handleKeyUp = (event: any) => {
-    if (event.key === 'Shift') {
-      setShiftLocked(false);
-    }
-  };
-
   const receiveMessage = (event: { data: any }) => {
     if (event.data.type === 'POST_DISPLAY') {
       setDisplay([...new Uint8Array(event.data.display)]);
@@ -127,8 +114,9 @@ const BaseTec1 = ({ className }: Stylable) => {
   };
 
   React.useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
+    if (ref && ref.current) {
+      ref.current.focus();
+    }
     addVisibilityListener(handleVisibility);
     const newWorker = new Worker('../../worker/worker.ts');
     setWorker(newWorker);
@@ -143,8 +131,6 @@ const BaseTec1 = ({ className }: Stylable) => {
       if (newWorker) {
         newWorker.terminate();
       }
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
       removeVisiblityListener(handleVisibility);
     };
   }, []);
@@ -160,8 +146,30 @@ const BaseTec1 = ({ className }: Stylable) => {
     postWorkerMessage({ type: 'HIDDEN', value: hidden });
   }, [worker, hidden]);
 
+  const reactKeyDown = (event: any) => {
+    const { shiftKey, key } = event;
+    console.log(key);
+    if (shiftKey) {
+      setShiftLocked(true);
+    }
+    handleCode(key.length === 1 ? key.toUpperCase() : key);
+  };
+
+  const reactKeyUp = (event: any) => {
+    const { shiftKey } = event;
+    if (shiftKey) {
+      setShiftLocked(false);
+    }
+  };
+
   return (
-    <div className={`${className} tec1-app`}>
+    <div
+      className={`${className} tec1-app`}
+      tabIndex={0}
+      onKeyDown={reactKeyDown}
+      onKeyUp={reactKeyUp}
+      ref={ref}
+    >
       {worker && <Header worker={worker} />}
       <Main
         layout={layout}

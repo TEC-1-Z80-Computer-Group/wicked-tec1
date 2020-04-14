@@ -27,7 +27,7 @@ const BaseKeypad = ({ keyMap, onClick, className }: KeypadProps) => {
           const key = keyMap[index];
           const x = index % 5;
           const y = Math.floor(index / 5);
-          const code = keyNames[key];
+          const code = key in keyNames ? keyNames[key] : key;
           return (
             <KeyButton
               key={index}
