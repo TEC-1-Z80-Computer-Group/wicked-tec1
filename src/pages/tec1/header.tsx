@@ -8,7 +8,7 @@ interface HeaderProps extends Stylable {
 
 const BaseHeader = ({ worker, className }: HeaderProps) => {
   const handleUpload = (event: any) => {
-    const {files} = event.target;
+    const { files } = event.target;
     if (files == null || files.length === 0) return;
     const file = files[0];
     const reader = new FileReader();

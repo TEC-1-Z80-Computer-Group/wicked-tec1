@@ -1,6 +1,6 @@
-import { KeyNamesMap, KeyCodesMap } from './types';
+import { Dict } from '../../types';
 
-export const keyCodes: KeyCodesMap = {
+export const keyCodes: Dict<number> = {
   0: 0x00,
   1: 0x01,
   2: 0x02,
@@ -26,12 +26,12 @@ export const keyCodes: KeyCodesMap = {
   ArrowUp: 0x10,
 };
 
-export const keyNames: KeyNamesMap = {
+export const keyTranslation: Dict<string> = {
   '@': 'Tab',
   G: 'Enter',
 };
 
-export const layouts: KeyNamesMap = {
+export const layouts: Dict<string> = {
   CLASSIC: '@37BFG26AE-159D+048C',
   MODERN: '@CDEFG89AB-4567+0123',
   JELIC: '@789AG456B-123C+0FED',

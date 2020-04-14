@@ -7,7 +7,7 @@ import {
   audioValue,
   isAudioInitialised,
 } from '../../util/audio';
-import { keyCodes, layouts } from '../../constants';
+import { keyCodes, layouts } from './tec1-constants';
 import { Stylable } from '../../types';
 import { Header } from './header';
 import { Main } from './main';

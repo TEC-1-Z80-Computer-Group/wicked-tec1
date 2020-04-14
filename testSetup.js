@@ -1,2 +1,1 @@
-
-window.scrollTo = (x, y) => { };
+window.scrollTo = (_x, _y) => { };

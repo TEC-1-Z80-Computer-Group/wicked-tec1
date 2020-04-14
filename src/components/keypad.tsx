@@ -2,12 +2,13 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { KeyButton } from './key-button';
 import { Stylable, EventFunc } from '../types';
-import { keyNames } from '../constants';
+import { keyTranslation } from '../pages/tec1/tec1-constants';
 
 const getKeyText = (key: string) => {
   if (key === '@') {
     return 'AD';
-  } if (key === 'G') {
+  }
+  if (key === 'G') {
     return 'GO';
   }
   return key;
@@ -27,7 +28,7 @@ const BaseKeypad = ({ keyMap, onClick, className }: KeypadProps) => {
           const key = keyMap[index];
           const x = index % 5;
           const y = Math.floor(index / 5);
-          const code = key in keyNames ? keyNames[key] : key;
+          const code = key in keyTranslation ? keyTranslation[key] : key;
           return (
             <KeyButton
               key={index}

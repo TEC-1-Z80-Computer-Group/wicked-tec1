@@ -24,9 +24,9 @@ body {
 }
 `;
 
-const customTheme = ((theme: AnyObj) => {
-  return {...theme};
-});
+const customTheme = (theme: AnyObj) => {
+  return { ...theme };
+};
 
 export const App: React.FC<any> = () => {
   return (
@@ -37,5 +37,5 @@ export const App: React.FC<any> = () => {
       </ThemeProvider>
     </>
   );
-}
-App.displayName = 'App'
+};
+App.displayName = 'App';

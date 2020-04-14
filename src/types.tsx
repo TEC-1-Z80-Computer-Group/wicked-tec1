@@ -1,6 +1,8 @@
 import { StyledProps } from 'styled-components';
 
-// export interface Dict<T> { [key: string]: T }
+export interface Dict<T> {
+  [key: string]: T;
+}
 
 export type AnyObj = { [key: string]: any };
 
@@ -27,14 +29,6 @@ export interface CPUMessage extends Message {
   buffer: ArrayBuffer;
   display: ArrayBuffer;
   wavelength: any;
-}
-
-export interface KeyNamesMap {
-  [key: string]: string;
-}
-
-export interface KeyCodesMap {
-  [key: string]: number;
 }
 
 export type Thunk = () => void;
