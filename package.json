@@ -1,16 +1,14 @@
 {
-  "name": "ts-boilerplate",
+  "name": "wicked-tec1",
   "version": "1.0.0",
-  "description": "A ready to dev React in TS project.",
+  "description": "An emulation of the TEC-1",
   "main": "index.js",
   "scripts": {
     "lint": "eslint src/**/*.ts* --fix",
     "start": "parcel ./src/index.html --port 1334",
-    "stubs": "node ./stubby/index.js",
     "build": "parcel build ./src/index.html --public-url /wicked-tec1/",
     "test": "npm run lint && jest --coverage",
-    "test-dev": "jest",
-    "test-travis": "jest --coverage"
+    "test-dev": "jest"
   },
   "keywords": [
     "parcel",
