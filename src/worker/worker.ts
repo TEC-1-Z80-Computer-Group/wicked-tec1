@@ -1,7 +1,6 @@
-/* eslint-disable prefer-const */
 import MemoryMap from 'nrf-intel-hex';
-import { Z80Cpu, Z80 } from './z80';
 import { throttle } from '../util/tools';
+import { execute, reset, interrupt, init } from './z80';
 
 const sixtyfourK = 0x10000;
 
@@ -17,7 +16,7 @@ const display = Array(6).fill(0);
 let speaker = 1;
 let wavelength = 0;
 
-let cpu: Z80Cpu;
+const cpu = init();
 
 const postAllMemory = throttle(
   () => {
@@ -93,19 +92,34 @@ function ioWrite(port: number, value: number) {
   postDisplay();
 }
 
+const cb = {
+  mem_read: (addr: number) => memory[addr],
+  mem_write: (addr: number, value: number) => {
+    const oldValue = memory[addr];
+    memory[addr] = value;
+    if (oldValue !== value) {
+      postAllMemory();
+    }
+  },
+  io_read: (port: number) => {
+    return inPorts[port & 0xff];
+  },
+  io_write: ioWrite,
+};
+
 function* runGen() {
   while (true) {
     for (let i = 0; i < 1000; i++) {
       try {
-        const count = cpu.run_instruction();
+        const count = execute(cpu, cb);
         cycles += count;
       } catch (e) {
-        const pc = cpu.getPC();
-        const mem = memory[cpu.getPC()] || 0;
+        const pc = cpu.pc;
+        const mem = memory[pc] || 0;
         console.log(
           `Illegal operation at ${pc.toString(16)}: ${mem.toString(16)}`
         );
-        cpu.reset();
+        reset(cpu);
       }
     }
     yield cycles;
@@ -128,9 +142,9 @@ function run() {
   }
 }
 
-const resetRun = (reset: boolean) => {
-  if (reset) {
-    cpu.reset();
+const resetRun = (doReset: boolean) => {
+  if (doReset) {
+    reset(cpu);
   }
   running = true;
   run();
@@ -162,7 +176,7 @@ const doSetSpeed = (event: any) => {
 };
 
 const doNMI = () => {
-  cpu.interrupt(true, 0);
+  interrupt(cpu, cb, true, 0);
 };
 
 const doUpdateMemory = (event: any) => {
@@ -230,18 +244,3 @@ self.onmessage = (event: any) => {
     doProcessHidden(event);
   }
 };
-
-cpu = Z80({
-  mem_read: (addr: number) => memory[addr],
-  mem_write: (addr: number, value: number) => {
-    const oldValue = memory[addr];
-    memory[addr] = value;
-    if (oldValue !== value) {
-      postAllMemory();
-    }
-  },
-  io_read: (port: number) => {
-    return inPorts[port & 0xff];
-  },
-  io_write: ioWrite,
-});

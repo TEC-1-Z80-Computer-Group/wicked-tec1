@@ -17,7 +17,7 @@ import {
   addVisibilityListener,
   removeVisiblityListener,
 } from '../../util/page-visibility';
-import { ROM as Mon1BRom } from '../../roms/MON-1B';
+import { ROM as Mon1BRom } from './MON-1B';
 
 const anchor = document.createElement('a');
 
