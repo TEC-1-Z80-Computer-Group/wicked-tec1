@@ -5,13 +5,17 @@ import { Stylable } from '../../types';
 interface FooterProps extends Stylable {
   worker: any;
   layout: string;
+  mapping: string;
   onChangeLayout: (layout: string) => void;
+  onChangeMapping: (mapping: string) => void;
 }
 
 const BaseFooter = ({
   worker,
   layout,
+  mapping,
   onChangeLayout,
+  onChangeMapping,
   className,
 }: FooterProps) => {
   const [speed, setSpeed] = React.useState('50');
@@ -39,6 +43,16 @@ To restore the original TEC-1 layout clear the text.
     }
   };
 
+  const handleMappingButton = () => {
+    const newMapping = window.prompt(
+      'Enter keyboard mapping (or JELIC)',
+      mapping
+    );
+    if (newMapping != null) {
+      onChangeMapping(newMapping);
+    }
+  };
+
   const handleChangeSpeed = (event: any) => {
     const { value } = event.target;
     localStorage.setItem('speed', String(value));
@@ -51,6 +65,11 @@ To restore the original TEC-1 layout clear the text.
         <div>
           <button type="button" onClick={handleLayoutButton}>
             Keypad layout
+          </button>
+        </div>
+        <div>
+          <button type="button" onClick={handleMappingButton}>
+            Keyboard map
           </button>
         </div>
         <div>

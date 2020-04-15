@@ -25,7 +25,7 @@ const BaseMain = ({
       <div className="digit-pane">
         <DigitPane display={display} />
       </div>
-      <Keypad onClick={handleCode} keyMap={layout} />
+      <Keypad onClick={handleCode} translate={layout} />
       <KeyButton
         code={'Escape'}
         text={'R'}

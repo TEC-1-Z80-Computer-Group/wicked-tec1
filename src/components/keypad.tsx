@@ -1,8 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { KeyButton } from './key-button';
-import { Stylable, EventFunc } from '../types';
-import { keyTranslation } from '../pages/tec1/tec1-constants';
+import { Stylable, EventFunc, Dict } from '../types';
 
 const getKeyText = (key: string) => {
   if (key === '@') {
@@ -14,18 +13,23 @@ const getKeyText = (key: string) => {
   return key;
 };
 
+const keyTranslation: Dict<any> = {
+  '@': 'Tab',
+  G: 'Enter',
+};
+
 interface KeypadProps extends Stylable {
-  keyMap: string;
+  translate: string;
   onClick: EventFunc;
 }
 
-const BaseKeypad = ({ keyMap, onClick, className }: KeypadProps) => {
+const BaseKeypad = ({ translate, onClick, className }: KeypadProps) => {
   return (
     <div className={`${className} keypad-classic`}>
       {Array(5 * 4)
         .fill(0)
         .map((_item, index) => {
-          const key = keyMap[index];
+          const key = translate[index];
           const x = index % 5;
           const y = Math.floor(index / 5);
           const code = key in keyTranslation ? keyTranslation[key] : key;

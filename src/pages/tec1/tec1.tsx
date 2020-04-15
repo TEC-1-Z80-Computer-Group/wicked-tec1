@@ -7,7 +7,7 @@ import {
   audioValue,
   isAudioInitialised,
 } from '../../util/audio';
-import { keyCodes, layouts } from './tec1-constants';
+import { layouts, keyMap, keyCodes } from '../../constants';
 import { Stylable } from '../../types';
 import { Header } from './header';
 import { Main } from './main';
@@ -21,6 +21,30 @@ import { ROM as Mon1BRom } from './MON-1B';
 
 const anchor = document.createElement('a');
 
+const getTecHexKey = (code: string) => {
+  if (code.length !== 1) return null;
+  const hex = parseInt(code, 16);
+  return isNaN(hex) ? null : hex;
+};
+
+const getTecKey = (code: string, shiftLocked: boolean) => {
+  const code1 = code in keyMap ? keyMap[code] : code;
+  let tecKey = getTecHexKey(code1);
+  if (tecKey == null) {
+    if (!(code1 in keyCodes)) {
+      return false;
+    }
+    tecKey = keyCodes[code1];
+  }
+  const bit5 = 0b00100000;
+  const mask = ~bit5;
+  let tecKey1 = tecKey & mask;
+  if (!shiftLocked) {
+    tecKey1 |= bit5;
+  }
+  return tecKey1;
+};
+
 const BaseTec1 = ({ className }: Stylable) => {
   const ref = React.useRef<HTMLInputElement>(null);
   const [display, setDisplay] = React.useState(Array(6).fill(0));
@@ -29,6 +53,11 @@ const BaseTec1 = ({ className }: Stylable) => {
   const [layout, setLayout] = React.useState(
     localStorage.getItem('layout') || layouts.CLASSIC
   );
+  const [mapping, setMapping] = React.useState(
+    localStorage.getItem('mapping') || ''
+  );
+  const [mappingObj, setMappingObj] = React.useState('');
+
   const [hidden, setHidden] = React.useState(false);
 
   const postWorkerMessage = (message: any) => {
@@ -42,14 +71,24 @@ const BaseTec1 = ({ className }: Stylable) => {
   };
 
   const handleChangeLayout = (newLayout: string) => {
-    const n = newLayout?.toUpperCase() || '';
-    if (!n) {
+    const newLayout1 = newLayout?.toUpperCase() || '';
+    if (!newLayout1) {
       setLayout(layouts.CLASSIC);
-    } else if (n in layouts) {
-      setLayout(layouts[n]);
+    } else if (newLayout1 in layouts) {
+      setLayout(layouts[newLayout1]);
     } else {
-      setLayout(n);
+      setLayout(newLayout1);
     }
+    localStorage.setItem('layout', newLayout1);
+  };
+
+  const handleMappingButton = (newMapping: string) => {
+    let newMapping1 = newMapping || '';
+    if (newMapping1 === 'JELIC') {
+      newMapping1 = '/:A,*:B,-:C,+:D,Enter:E,.:F,ArrowRight:+,ArrowLeft:-,ArrowUp:Tab,ArrowDown:Enter,';
+    }
+    setMapping(newMapping1);
+    localStorage.setItem('mapping', newMapping1);
   };
 
   const handleCode = (code: string) => {
@@ -64,23 +103,18 @@ const BaseTec1 = ({ className }: Stylable) => {
       setShiftLocked(!shiftLocked);
       return true;
     }
-    if (code in keyCodes) {
-      const keyCode = keyCodes[code];
-      if (keyCode == null) return false;
-      const bit5 = 0b00100000;
-      const mask = ~bit5;
-      let keyCode1 = keyCode & mask;
-      if (!shiftLocked) keyCode1 |= bit5;
-      postWorkerMessage({ type: 'SET_INPUT_VALUE', port: 0, value: keyCode1 });
-      postWorkerMessage({
-        type: 'SET_KEY_VALUE',
-        code: keyCode1,
-        pressed: !shiftLocked,
-      });
-      postWorkerMessage({ type: 'NMI' });
-      return true;
+    if (code === 'Shift') {
+      return false;
     }
-    return false;
+    const tecKey = getTecKey(code, shiftLocked);
+    postWorkerMessage({ type: 'SET_INPUT_VALUE', port: 0, value: tecKey });
+    postWorkerMessage({
+      type: 'SET_KEY_VALUE',
+      code: tecKey,
+      pressed: !shiftLocked,
+    });
+    postWorkerMessage({ type: 'NMI' });
+    return true;
   };
 
   const receiveMessage = (event: { data: any }) => {
@@ -136,8 +170,14 @@ const BaseTec1 = ({ className }: Stylable) => {
   }, []);
 
   React.useEffect(() => {
-    localStorage.setItem('layout', layout);
-  }, [layout]);
+    const pairs = (mapping || '').split(',');
+    const entries = pairs
+      .map((pair) => pair.split(':'))
+      .filter((entry) => entry.length === 2);
+    const newMappingObj = Object.fromEntries(entries);
+    console.log({newMappingObj});
+    setMappingObj(newMappingObj);
+  }, [mapping]);
 
   React.useEffect(() => {
     if (isAudioInitialised()) {
@@ -147,17 +187,16 @@ const BaseTec1 = ({ className }: Stylable) => {
   }, [worker, hidden]);
 
   const reactKeyDown = (event: any) => {
-    const { shiftKey, key } = event;
+    const { key } = event;
     console.log(key);
-    if (shiftKey) {
+    if (event.key === 'Shift') {
       setShiftLocked(true);
     }
     handleCode(key.length === 1 ? key.toUpperCase() : key);
   };
 
   const reactKeyUp = (event: any) => {
-    const { shiftKey } = event;
-    if (shiftKey) {
+    if (event.key === 'Shift') {
       setShiftLocked(false);
     }
   };
@@ -181,7 +220,9 @@ const BaseTec1 = ({ className }: Stylable) => {
         <Footer
           worker={worker}
           layout={layout}
+          mapping={mapping}
           onChangeLayout={handleChangeLayout}
+          onChangeMapping={handleMappingButton}
         />
       )}
     </div>
