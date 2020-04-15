@@ -12,21 +12,11 @@ export const keyCodes: Dict<any> = {
   '-': MINUS,
 };
 
-export const keyMap: Dict<any> = {
-  '/': 'A',
-  '*': 'B',
-  '-': 'C',
-  '+': 'D',
-  Enter: 'E',
-  '.': 'F',
-  ArrowRight: '+',
-  ArrowLeft: '-',
-  ArrowUp: 'Tab',
-  ArrowDown: 'Enter',
-};
-
 export const layouts: Dict<string> = {
   CLASSIC: '@37BFG26AE-159D+048C',
   MODERN: '@CDEFG89AB-4567+0123',
   JELIC: '@789AG456B-123C+0FED',
 };
+
+export const jelicMapping =
+  '/:A,*:B,-:C,+:D,Enter:E,.:F,ArrowRight:+,ArrowLeft:-,ArrowUp:Tab,ArrowDown:Enter,';

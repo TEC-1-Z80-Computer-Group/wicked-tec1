@@ -45,7 +45,12 @@ To restore the original TEC-1 layout clear the text.
 
   const handleMappingButton = () => {
     const newMapping = window.prompt(
-      'Enter keyboard mapping (or JELIC)',
+      `Enter mapping from keyboard to keypad as a string in the form:
+k1:k2,k3:k4,k5:k6
+Most keys are represented a their value e.g. A, 1, / etc.
+Other keys are represented by strings: Enter, ArrowRight etc
+see: https://www.w3.org/TR/uievents/#fixed-virtual-key-codes
+      `,
       mapping
     );
     if (newMapping != null) {

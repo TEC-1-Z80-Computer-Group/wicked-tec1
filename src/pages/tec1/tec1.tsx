@@ -7,8 +7,8 @@ import {
   audioValue,
   isAudioInitialised,
 } from '../../util/audio';
-import { layouts, keyMap, keyCodes } from '../../constants';
-import { Stylable } from '../../types';
+import { layouts, keyCodes, jelicMapping } from '../../constants';
+import { Stylable, Dict } from '../../types';
 import { Header } from './header';
 import { Main } from './main';
 import { Footer } from './footer';
@@ -27,8 +27,12 @@ const getTecHexKey = (code: string) => {
   return isNaN(hex) ? null : hex;
 };
 
-const getTecKey = (code: string, shiftLocked: boolean) => {
-  const code1 = code in keyMap ? keyMap[code] : code;
+const getTecKey = (
+  code: string,
+  shiftLocked: boolean,
+  mappingObj: Dict<any>
+) => {
+  const code1 = code in mappingObj ? mappingObj[code] : code;
   let tecKey = getTecHexKey(code1);
   if (tecKey == null) {
     if (!(code1 in keyCodes)) {
@@ -56,7 +60,7 @@ const BaseTec1 = ({ className }: Stylable) => {
   const [mapping, setMapping] = React.useState(
     localStorage.getItem('mapping') || ''
   );
-  const [mappingObj, setMappingObj] = React.useState('');
+  const [mappingObj, setMappingObj] = React.useState();
 
   const [hidden, setHidden] = React.useState(false);
 
@@ -84,8 +88,8 @@ const BaseTec1 = ({ className }: Stylable) => {
 
   const handleMappingButton = (newMapping: string) => {
     let newMapping1 = newMapping || '';
-    if (newMapping1 === 'JELIC') {
-      newMapping1 = '/:A,*:B,-:C,+:D,Enter:E,.:F,ArrowRight:+,ArrowLeft:-,ArrowUp:Tab,ArrowDown:Enter,';
+    if (newMapping1.toUpperCase() === 'JELIC') {
+      newMapping1 = jelicMapping;
     }
     setMapping(newMapping1);
     localStorage.setItem('mapping', newMapping1);
@@ -106,7 +110,7 @@ const BaseTec1 = ({ className }: Stylable) => {
     if (code === 'Shift') {
       return false;
     }
-    const tecKey = getTecKey(code, shiftLocked);
+    const tecKey = getTecKey(code, shiftLocked, mappingObj);
     postWorkerMessage({ type: 'SET_INPUT_VALUE', port: 0, value: tecKey });
     postWorkerMessage({
       type: 'SET_KEY_VALUE',
@@ -175,7 +179,7 @@ const BaseTec1 = ({ className }: Stylable) => {
       .map((pair) => pair.split(':'))
       .filter((entry) => entry.length === 2);
     const newMappingObj = Object.fromEntries(entries);
-    console.log({newMappingObj});
+    console.log({ newMappingObj });
     setMappingObj(newMappingObj);
   }, [mapping]);
 
