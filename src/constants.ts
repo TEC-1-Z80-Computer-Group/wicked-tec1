@@ -19,4 +19,4 @@ export const layouts: Dict<string> = {
 };
 
 export const jelicMapping =
-  '/:A,*:B,-:C,+:D,Enter:E,.:F,ArrowRight:+,ArrowLeft:-,ArrowUp:Tab,ArrowDown:Enter,';
+  '/:A *:B -:C +:D Enter:E .:F ArrowRight:+ ArrowLeft:- ArrowUp:Tab ArrowDown:Enter ';

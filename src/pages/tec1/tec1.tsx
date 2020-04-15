@@ -174,7 +174,7 @@ const BaseTec1 = ({ className }: Stylable) => {
   }, []);
 
   React.useEffect(() => {
-    const pairs = (mapping || '').split(',');
+    const pairs = (mapping || '').trim().split(' ');
     const entries = pairs
       .map((pair) => pair.split(':'))
       .filter((entry) => entry.length === 2);
@@ -192,7 +192,6 @@ const BaseTec1 = ({ className }: Stylable) => {
 
   const reactKeyDown = (event: any) => {
     const { key } = event;
-    console.log(key);
     if (event.key === 'Shift') {
       setShiftLocked(true);
     }
