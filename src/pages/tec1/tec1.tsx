@@ -75,7 +75,7 @@ const BaseTec1 = ({ className }: Stylable) => {
   };
 
   const handleChangeLayout = (newLayout: string) => {
-    const newLayout1 = newLayout?.toUpperCase() || '';
+    const newLayout1 = (newLayout || '').trim().toUpperCase();
     if (!newLayout1) {
       setLayout(layouts.CLASSIC);
     } else if (newLayout1 in layouts) {
