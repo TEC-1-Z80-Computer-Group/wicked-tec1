@@ -6,7 +6,16 @@ interface HeaderProps extends Stylable {
   worker: any;
 }
 
+const roms = {
+  'MON-1': () => import('../../roms/MON-1'),
+  'MON-1A': () => import('../../roms/MON-1A'),
+  'MON-1B': () => import('../../roms/MON-1B'),
+  'MON-2': () => import('../../roms/MON-2'),
+  'JMON': () => import('../../roms/JMON'),
+};
+
 const BaseHeader = ({ worker, className }: HeaderProps) => {
+
   const handleUpload = (event: any) => {
     const { files } = event.target;
     if (files == null || files.length === 0) return;
@@ -15,6 +24,17 @@ const BaseHeader = ({ worker, className }: HeaderProps) => {
     reader.onload = () =>
       worker.postMessage({ type: 'UPDATE_MEMORY', value: reader.result });
     reader.readAsText(file);
+  };
+
+  const handleChangeROM = async (event: any) => {
+    // we need to use import(literal_path) for
+    // parcel to correctly bundle for lazy loading
+    const name = event.target.value as keyof typeof roms;
+    if (name) {
+      const func = roms[name];
+      const result = await func();
+      worker.postMessage({ type: 'UPDATE_MEMORY', value: result.ROM })
+    }
   };
 
   const handleDownload = () => {
@@ -38,6 +58,15 @@ const BaseHeader = ({ worker, className }: HeaderProps) => {
           onChange={handleUpload}
         />
       </div>
+      <div>
+        <label htmlFor="rom-select">ROM</label>
+        <select id="rom-select" onChange={handleChangeROM}>
+          <option value="">Select</option>
+          {Object.keys(roms).map(key =>
+            <option key={key}>{key}</option>)
+          }
+        </select>
+      </div>
       <button onClick={handleDownload}>Download</button>
     </div>
   );
@@ -47,4 +76,8 @@ export const Header = styled(BaseHeader)`
   justify-content: space-between;
   align-items: center;
   margin: 3px;
+
+  label {
+    margin-right: 0.25em;
+  }
 `;
