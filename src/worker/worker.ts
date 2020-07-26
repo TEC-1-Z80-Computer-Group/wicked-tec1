@@ -7,6 +7,7 @@ const sixtyfourK = 0x10000;
 let running = false;
 const active = true;
 let speed = 30;
+let smooth = true;
 
 let cycles = 0;
 const memory = new Uint8Array(new ArrayBuffer(sixtyfourK)).fill(0xff);
@@ -20,7 +21,6 @@ const cpu = init();
 
 const postAllMemory = throttle(
   () => {
-    console.log(memory[0x800].toString(16));
     const memMap = new MemoryMap();
     const bytes = new Uint8Array(memory);
     memMap.set(0, bytes);
@@ -59,6 +59,9 @@ function ioWrite(port: number, value: number) {
   for (let i = 0; i < 6; i++) {
     if (digits & mask) {
       display[i] = segments;
+    }
+    else if (!smooth) {
+      display[i] = 0;
     }
     mask <<= 1;
   }
@@ -116,7 +119,7 @@ function* runGen() {
       } catch (e) {
         const pc = cpu.pc;
         const mem = memory[pc] || 0;
-        console.log(
+        console.error(
           `Illegal operation at ${pc.toString(16)}: ${mem.toString(16)}`
         );
         reset(cpu);
@@ -173,6 +176,10 @@ const doSetKeyValue = (event: any) => {
 
 const doSetSpeed = (event: any) => {
   speed = Number(event.data.value) / 100;
+};
+
+const doSetSmooth = (event: any) => {
+  smooth = event.data.value === true;
 };
 
 const doNMI = () => {
@@ -232,6 +239,8 @@ self.onmessage = (event: any) => {
     doSetInputValue(event);
   } else if (event.data.type === 'SET_KEY_VALUE') {
     doSetKeyValue(event);
+  } else if (event.data.type === 'SET_SMOOTH') {
+    doSetSmooth(event);
   } else if (event.data.type === 'SET_SPEED') {
     doSetSpeed(event);
   } else if (event.data.type === 'NMI') {

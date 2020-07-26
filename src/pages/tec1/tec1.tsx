@@ -179,7 +179,6 @@ const BaseTec1 = ({ className }: Stylable) => {
       .map((pair) => pair.split(':'))
       .filter((entry) => entry.length === 2);
     const newMappingObj = Object.fromEntries(entries);
-    console.log({ newMappingObj });
     setMappingObj(newMappingObj);
   }, [mapping]);
 

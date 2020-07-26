@@ -19,7 +19,7 @@ const BaseFooter = ({
   className,
 }: FooterProps) => {
   const s = localStorage.getItem('smooth');
-  const [smooth, setSmooth] = React.useState( s == null ? true : s === 'true');
+  const [smooth, setSmooth] = React.useState(true);
   const [speed, setSpeed] = React.useState('50');
 
   const postSpeed = (newSpeed: string) => {
@@ -27,9 +27,17 @@ const BaseFooter = ({
     worker.postMessage({ type: 'SET_SPEED', value: newSpeed });
   };
 
+  const postSmooth = (newSmooth: boolean) => {
+    setSmooth(newSmooth);
+    worker.postMessage({ type: 'SET_SMOOTH', value: newSmooth });
+  };
+
   React.useEffect(() => {
-    const s = localStorage.getItem('speed') || '50';
-    postSpeed(s);
+    const speed0 = localStorage.getItem('speed') || '50';
+    const smooth0 = localStorage.getItem('smooth');
+    const smooth1 = smooth0 == null ? true : smooth0 === 'true'
+    postSpeed(speed0);
+    postSmooth(smooth1);
   }, []);
 
   const handleLayoutButton = () => {
@@ -60,9 +68,10 @@ see: https://www.w3.org/TR/uievents/#fixed-virtual-key-codes
     }
   };
 
-  const handleSmooth = () => {
-    localStorage.setItem('smooth', '' + !smooth);
-    setSmooth(!smooth);
+  const handleChangeSmooth = () => {
+    const smooth1 = !smooth;
+    localStorage.setItem('smooth', String(smooth1));
+    postSmooth(smooth1);
   };
 
   const handleChangeSpeed = (event: any) => {
@@ -85,7 +94,7 @@ see: https://www.w3.org/TR/uievents/#fixed-virtual-key-codes
           </button>
         </div>
         <div>
-          <input id="smooth" type="checkbox" checked={smooth} onChange={handleSmooth} />
+          <input id="smooth" type="checkbox" checked={smooth} onChange={handleChangeSmooth} />
           <label htmlFor="smooth">Smooth</label>
         </div>
         <div>
