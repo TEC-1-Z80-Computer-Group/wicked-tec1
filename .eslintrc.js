@@ -42,7 +42,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 0,
     'import/prefer-default-export': 0,
     'import/no-unresolved': 0,
-    'max-lines': ['error', { max: 250, skipComments: true }],
+    'max-lines': ['error', { max: 400, skipComments: true }],
     'no-alert': 0,
     'no-bitwise': 0,
     'no-nested-ternary': 0,
