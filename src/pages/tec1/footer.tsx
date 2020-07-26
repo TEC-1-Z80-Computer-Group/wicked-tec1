@@ -18,6 +18,8 @@ const BaseFooter = ({
   onChangeMapping,
   className,
 }: FooterProps) => {
+  const s = localStorage.getItem('smooth');
+  const [smooth, setSmooth] = React.useState( s == null ? true : s === 'true');
   const [speed, setSpeed] = React.useState('50');
 
   const postSpeed = (newSpeed: string) => {
@@ -58,6 +60,11 @@ see: https://www.w3.org/TR/uievents/#fixed-virtual-key-codes
     }
   };
 
+  const handleSmooth = () => {
+    localStorage.setItem('smooth', '' + !smooth);
+    setSmooth(!smooth);
+  };
+
   const handleChangeSpeed = (event: any) => {
     const { value } = event.target;
     localStorage.setItem('speed', String(value));
@@ -76,6 +83,10 @@ see: https://www.w3.org/TR/uievents/#fixed-virtual-key-codes
           <button type="button" onClick={handleMappingButton}>
             Keyboard map
           </button>
+        </div>
+        <div>
+          <input id="smooth" type="checkbox" checked={smooth} onChange={handleSmooth} />
+          <label htmlFor="smooth">Smooth</label>
         </div>
         <div>
           <label htmlFor="speed">

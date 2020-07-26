@@ -16,6 +16,8 @@ const roms = {
 
 const BaseHeader = ({ worker, className }: HeaderProps) => {
 
+  const [rom, setRom] = React.useState('');
+
   const handleUpload = (event: any) => {
     const { files } = event.target;
     if (files == null || files.length === 0) return;
@@ -24,13 +26,16 @@ const BaseHeader = ({ worker, className }: HeaderProps) => {
     reader.onload = () =>
       worker.postMessage({ type: 'UPDATE_MEMORY', value: reader.result });
     reader.readAsText(file);
+    setRom('');
   };
 
   const handleChangeROM = async (event: any) => {
     // we need to use import(literal_path) for
     // parcel to correctly bundle for lazy loading
-    const name = event.target.value as keyof typeof roms;
+    const { value } = event.target;
+    const name = value as keyof typeof roms;
     if (name) {
+      setRom(name);
       const func = roms[name];
       const result = await func();
       worker.postMessage({ type: 'UPDATE_MEMORY', value: result.ROM })
@@ -60,7 +65,7 @@ const BaseHeader = ({ worker, className }: HeaderProps) => {
       </div>
       <div>
         <label htmlFor="rom-select">ROM</label>
-        <select id="rom-select" onChange={handleChangeROM}>
+        <select id="rom-select" value={rom} onChange={handleChangeROM}>
           <option value="">Select</option>
           {Object.keys(roms).map(key =>
             <option key={key}>{key}</option>)
